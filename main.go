@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	sorter "github.com/hatchify/dependency-sorter"
 )
 
-func main() {
+func readInput() {
 	var (
 		err  error
 		text string
@@ -18,15 +20,25 @@ func main() {
 
 	// Get files from stdin (piped from another program's output)
 	for err == nil {
-		text = strings.TrimSpace(text)
-		if len(text) > 0 {
+		if text = strings.TrimSpace(text); len(text) > 0 {
 			files = append(files, text)
 		}
+
 		text, err = reader.ReadString('\n')
 	}
 
 	// Print files
 	for i := range files {
 		fmt.Println(files[i])
+	}
+}
+
+func main() {
+	paths := sorter.GetLibsInDirectory(".")
+	itr := sorter.PopulateDeps(paths)
+	// Print files
+	for itr != nil {
+		fmt.Println(itr.Path)
+		itr = itr.Next
 	}
 }
