@@ -1,2 +1,4 @@
-github.com/hatchify/dependency-sorter v0.1.10 h1:RWU6Ixeyg3rxCK+nImprG/dKV3v0MX1IbD2Ffl3BKcU=
-github.com/hatchify/dependency-sorter v0.1.10/go.mod h1:PWhdViQBqGBsgEv8O/410Dk9GM22/4uzG1Y8H93OIwQ=
+github.com/Hatch1fy/errors v0.3.0 h1:KylivctV7WFButh5rYOSHJUTi2gcalRgsGkAfFk1FsY=
+github.com/Hatch1fy/errors v0.3.0/go.mod h1:SJFCeScmERvwtYMG7EU24Fe0KfXmiIs7tNlcIl0STKk=
+github.com/hatchify/dependency-sorter v0.1.11 h1:UNHdB8SrWmOe9YyEURsd6UM43LrwBKKMrZWClu0+j78=
+github.com/hatchify/dependency-sorter v0.1.11/go.mod h1:PWhdViQBqGBsgEv8O/410Dk9GM22/4uzG1Y8H93OIwQ=

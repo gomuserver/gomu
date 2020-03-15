@@ -35,22 +35,15 @@ func readInput() {
 }
 
 func main() {
-	// Parse flags
-	var dep string
-	flag.StringVar(&dep, "dep", "", "optional flag to search for libs that depend on a given dep")
 	flag.Parse()
+	dependingOn := flag.Args()
 
 	// Parse libs
 	paths := sorter.GetLibsInDirectory(".")
 
-	// Sort deps, filter if dep provided
-	fileHead := sorter.SortDeps(paths, dep)
-
-	// Print files
-	itr := fileHead
-	for itr != nil {
-		fmt.Println(itr.Path)
-
-		itr = itr.Next
+	// Sort deps, filter if deps provided
+	for fileItr := sorter.SortedDeps(paths, dependingOn); fileItr != nil; fileItr = fileItr.Next {
+		// Print files
+		fmt.Println(fileItr.Path)
 	}
 }
