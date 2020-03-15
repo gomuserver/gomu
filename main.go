@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -34,11 +35,22 @@ func readInput() {
 }
 
 func main() {
+	// Parse flags
+	var dep string
+	flag.StringVar(&dep, "dep", "", "optional flag to search for libs that depend on a given dep")
+	flag.Parse()
+
+	// Parse libs
 	paths := sorter.GetLibsInDirectory(".")
-	itr := sorter.PopulateDeps(paths)
+
+	// Sort deps, filter if dep provided
+	fileHead := sorter.SortDeps(paths, dep)
+
 	// Print files
+	itr := fileHead
 	for itr != nil {
 		fmt.Println(itr.Path)
+
 		itr = itr.Next
 	}
 }
