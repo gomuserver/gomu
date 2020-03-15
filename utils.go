@@ -8,7 +8,23 @@ import (
 	"strings"
 
 	"github.com/Hatch1fy/errors"
+	sorter "github.com/hatchify/dependency-sorter"
 )
+
+func getLibsInDirectory(dir string) (libs sorter.StringArray) {
+	cmd := exec.Command("ls")
+	cmd.Dir = dir
+	stdout, err := cmd.Output()
+
+	if err != nil {
+		return
+	}
+
+	// Parse files from exec "ls"
+	libs = strings.Split(string(stdout), "\n")
+
+	return
+}
 
 func gitPull(gitURL string) (resp string, err error) {
 	gitpull := exec.Command("git", "pull", "origin")

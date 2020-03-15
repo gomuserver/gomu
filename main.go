@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	sorter "github.com/hatchify/dependency-sorter"
 )
 
 func readInput() {
@@ -36,13 +34,13 @@ func readInput() {
 
 func main() {
 	flag.Parse()
-	dependingOn := flag.Args()
 
 	// Parse libs
-	paths := sorter.GetLibsInDirectory(".")
+	libs := getLibsInDirectory(".")
+	filterDeps := flag.Args()
 
-	// Sort deps, filter if deps provided
-	for fileItr := sorter.SortedDeps(paths, dependingOn); fileItr != nil; fileItr = fileItr.Next {
+	// Sort libs, filter if deps provided
+	for fileItr := libs.SortedLibsDependingOn(filterDeps); fileItr != nil; fileItr = fileItr.Next {
 		// Print files
 		fmt.Println(fileItr.Path)
 	}
