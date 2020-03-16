@@ -33,15 +33,18 @@ func readInput() {
 }
 
 func main() {
+	// Get optional args
 	flag.Parse()
 
 	// Parse libs
 	libs := getLibsInDirectory(".")
 	filterDeps := flag.Args()
 
-	// Sort libs, filter if deps provided
+	// Sort libs, filter if deps provided, list all if no arguments are given
 	for fileItr := libs.SortedLibsDependingOn(filterDeps); fileItr != nil; fileItr = fileItr.Next {
 		// Print files
 		fmt.Println(fileItr.Path)
+
+		// TODO: update go.mod at fileItr.path
 	}
 }
