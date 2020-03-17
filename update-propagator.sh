@@ -5,6 +5,7 @@ function get_master {
     # update working copy
     git checkout master > /dev/null 2>&1
     git pull > /dev/null 2>&1
+    git pull --tag > /dev/null 2>&1
 }
 
 function update_mod_files {
@@ -58,6 +59,7 @@ function main {
         cd $FILE || continue
 
         get_master
+        continue
 
         # ignore dirs without go.mod
         if [ -f "go.mod" ]; then
