@@ -122,14 +122,17 @@ func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.Strin
 	command = strings.ToLower(command)
 	switch command {
 	case "sync", "list", "deploy", "pull":
-		// Supported actions
+		// Supported actions. Fall through
+
 	case "version":
+		// Print version and exit without error
 		fmt.Println(version)
 		os.Exit(0)
 	case "help":
-		// exit without error
+		// Print help and exit without error
 		exit(0)
 	default:
+		// Show usage and exit with error
 		fmt.Println("\nError: Unsupported action: <" + command + ">")
 		exit(1)
 	}
