@@ -121,7 +121,7 @@ func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.Strin
 	// Check for supported actions
 	command = strings.ToLower(command)
 	switch command {
-	case "sync", "list", "deploy", "pull", "install":
+	case "sync", "list", "deploy", "pull":
 		// Supported actions
 	case "help":
 		// exit without error

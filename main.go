@@ -143,7 +143,7 @@ func main() {
 			}
 		}
 
-		if action == "install" || (action == "deploy" && itr.File.Updated || itr.File.Tagged || itr.File.Deployed) {
+		if action == "install" {
 			// Attempt installation
 			itr.File.Output("Building...")
 			if itr.File.RunCmd("go", "build", "-o", "testartifact.test") != nil {
