@@ -143,18 +143,16 @@ func main() {
 			}
 		}
 
-		if action == "install" {
-			if itr.File.Updated || itr.File.Tagged || itr.File.Deployed {
-				// Attempt installation
-				itr.File.Output("Installing...")
-				if itr.File.RunCmd("go", "install", "-trimpath") == nil {
-					itr.File.Installed = true
-					installedCount++
-					installedOutput = strconv.Itoa(installedCount) + ") Successfully installed"
-					itr.File.Output("Install successful!")
-				} else {
-					itr.File.Output("Install failed :(")
-				}
+		if action == "install" || action == "deploy" && itr.File.Updated {
+			// Attempt installation
+			itr.File.Output("Installing...")
+			if itr.File.RunCmd("go", "install", "-trimpath") == nil {
+				itr.File.Installed = true
+				installedCount++
+				installedOutput = strconv.Itoa(installedCount) + ") Successfully installed"
+				itr.File.Output("Install successful!")
+			} else {
+				itr.File.Output("Install failed :(")
 			}
 		}
 	}
