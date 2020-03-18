@@ -145,11 +145,21 @@ func main() {
 
 		if action == "install" || action == "deploy" && itr.File.Updated {
 			// Attempt installation
-			itr.File.Output("Installing...")
+			itr.File.Output("Building...")
+			if itr.File.RunCmd("go", "build", "-o", "testartifact.test") != nil {
+				itr.File.Output("Nothing to build")
+				continue
+			}
+
+			if itr.File.RunCmd("rm", "testartifact.test") != nil {
+				itr.File.Output("Nothing to install")
+				continue
+			}
+
 			if itr.File.RunCmd("go", "install", "-trimpath") == nil {
 				itr.File.Installed = true
 				installedCount++
-				installedOutput = strconv.Itoa(installedCount) + ") Successfully installed"
+				installedOutput += strconv.Itoa(installedCount) + ") " + itr.File.GetGoURL()
 				itr.File.Output("Install successful!")
 			} else {
 				itr.File.Output("Install failed :(")
