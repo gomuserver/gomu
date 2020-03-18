@@ -1,115 +1,164 @@
 package main
 
 import (
-	"bufio"
-	"flag"
 	"fmt"
-	"os"
 	"strings"
 
+	common "github.com/hatchify/mod-common"
 	sort "github.com/hatchify/mod-sort"
 	sync "github.com/hatchify/mod-sync"
 )
 
-func readInput() {
-	var (
-		err  error
-		text string
-	)
-
-	files := make([]string, 0)
-	reader := bufio.NewReader(os.Stdin)
-
-	// Get files from stdin (piped from another program's output)
-	for err == nil {
-		if text = strings.TrimSpace(text); len(text) > 0 {
-			files = append(files, text)
-		}
-
-		text, err = reader.ReadString('\n')
-	}
-
-	// Print files
-	for i := range files {
-		fmt.Println(files[i])
-	}
-}
-
 func main() {
-	// Flags
+	// Flags/Args
 	var (
-		tag        string
+		action string
+		tag    string
+
 		filterDeps sort.StringArray
 		targetDirs sort.StringArray
+
+		debug bool
 	)
 
-	// Get optional args for forcing a tag number and filtering target deps
-	flag.StringVar(&tag, "tag", "", "optional value to set for git tag")
-	flag.Var(&filterDeps, "filter", "optional, accepts multiple -filter flags to only list/sort libs which depend on one of the included filters")
-	flag.Var(&targetDirs, "target", "optional, accepts multiple -target flags to aggregate libs in multiple organizations")
-	flag.Parse()
-
-	if len(targetDirs) == 0 {
-		targetDirs = append(targetDirs, "")
-	}
+	// Parse command line values, check supported functions, set defaults
+	checkArgs(&action, &tag, &filterDeps, &targetDirs, &debug)
 
 	// Get all libs within target dirs
 	libs := getLibsInAny(targetDirs)
 	fmt.Println("Scanning", len(libs)+1, "file(s) in", targetDirs)
 
+	// Clean working directory
+	var f common.FileWrapper
+	for i := range libs {
+		f.Path = libs[i]
+		// Hide local changes to prevent interference with searching/syncing
+		f.Stash()
+	}
+
 	// Sort libs
 	fileHead, depCount := libs.SortedDependingOnAny(filterDeps)
 	if len(filterDeps) == 0 {
-		fmt.Println("Found", depCount, "lib(s)")
+		fmt.Println("Performing", action, "on", depCount, "lib(s)")
 	} else {
-		fmt.Println("Found", depCount, "lib(s) depending on", filterDeps)
+		fmt.Println("Performing", action, "on", depCount, "lib(s) depending on", filterDeps)
 	}
 
-	// Sort libs, filter if deps provided, list all if no arguments are given
+	// Output Stats
+	updateCount := 0
+	tagCount := 0
+	deployedCount := 0
+	updatedOutput := "\n"
+	taggedOutput := "\n"
+	deployedOutput := "\n"
+
+	// Perform action on sorted libs
 	index := 0
 	for itr := fileHead; itr != nil; itr = itr.Next {
 		index++
+
+		// If we're just listing files, we don't need to do anything else :)
+		if action == "list" {
+			fmt.Println("(", index, "/", depCount, ")", itr.File.Path)
+			continue
+		}
 
 		// Separate output
 		fmt.Println("")
 		fmt.Println("(", index, "/", depCount, ")", itr.File.Path)
 
-		// Update the dep if necessary
+		// Create sync lib ref from dep file
 		var lib sync.Library
 		lib.File = itr.File
-		if err := lib.Update("Update mod files. " + tag); err == nil {
+
+		if action == "deploy" {
+			// TODO: Branch and PR? Diff?
+			lib.File.Deployed = lib.ModDeploy(tag)
+			deployedCount++
+			deployedOutput += itr.File.Path + "\n"
+		}
+
+		// Aggregate updated versions of previously parsed deps
+		lib.ModSetDeps()
+
+		// Update the dep if necessary
+		if err := lib.ModUpdate("Update mod files. " + tag); err == nil {
 			// Dep was updated
-			itr.File.Updated = true
+			lib.File.Updated = true
+			updateCount++
+			updatedOutput += lib.File.Path
+		}
+
+		if strings.HasSuffix(strings.Trim(itr.File.Path, "/"), "-plugin") {
+			// Ignore tagging
+			continue
 		}
 
 		// Tag if forced or if able to increment
 		if len(tag) > 0 || lib.ShouldTag() {
-			// Ignore plugins even when forcing a tag
-			if !strings.HasSuffix(strings.Trim(itr.File.Path, "/"), "-plugin") {
-				itr.File.Version = lib.TagLib(tag)
+			itr.File.Version = lib.TagLib(tag)
+			itr.File.Tagged = true
+		}
+
+		if len(itr.File.Version) == 0 {
+			if len(tag) == 0 {
+				itr.File.Version = lib.GetCurrentTag()
+			} else {
+				itr.File.Version = tag
 			}
 		}
 	}
 
+	// Resume working directory
+	for i := range libs {
+		f.Path = libs[i]
+		f.StashPop()
+	}
+
 	// Count files updated and prepare status output
-	updateCount := 0
-	output := "\n"
 	for fileItr := fileHead; fileItr != nil; fileItr = fileItr.Next {
-		if fileItr.File.Updated {
-			updateCount++
-			output += fileItr.File.Path + " " + fileItr.File.Version + "\n"
+		if fileItr.File.Tagged {
+			tagCount++
+			taggedOutput += fileItr.File.Path + " " + fileItr.File.Version + "\n"
 		}
 	}
 
 	// Separator
 	fmt.Println("")
 
-	// Print status
+	if action == "list" {
+		// If we're just listing files, we don't need to do anything else :)
+		return
+	}
+
+	// Print update status
 	if updateCount == 0 {
 		fmt.Println("All libs already up to date!")
 		fmt.Println("")
 	} else {
 		fmt.Println("Updated", updateCount, "/", depCount, "lib(s):")
-		fmt.Println(output)
+		fmt.Println(updatedOutput)
+	}
+
+	// Print tag status
+	if tagCount == 0 {
+		fmt.Println("All tags already up to date!")
+		fmt.Println("")
+	} else {
+		fmt.Println("Tagged", tagCount, "/", depCount, "lib(s):")
+		fmt.Println(taggedOutput)
+	}
+
+	if action != "deploy" {
+		return
+	}
+
+	// Print deploys status
+	if deployedCount == 0 {
+		fmt.Println("No local changes to deploy in", depCount, "libs.")
+		fmt.Println("")
+	} else {
+		fmt.Println("Tagged", tagCount, "/", depCount, "lib(s):")
+		fmt.Println(taggedOutput)
 	}
 }
