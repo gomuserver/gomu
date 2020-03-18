@@ -87,6 +87,7 @@ func main() {
 
 		if action == "deploy" {
 			// TODO: Branch and PR? Diff?
+			lib.File.Output("Checking for local changes...")
 			lib.File.Deployed = lib.ModDeploy(tag)
 			if lib.File.Deployed {
 				deployedCount++
@@ -102,7 +103,7 @@ func main() {
 			// Dep was updated
 			lib.File.Updated = true
 			updateCount++
-			updatedOutput += lib.File.Path
+			updatedOutput += lib.File.Path + "\n"
 		}
 
 		if strings.HasSuffix(strings.Trim(itr.File.Path, "/"), "-plugin") {
@@ -150,37 +151,5 @@ func main() {
 		return
 	}
 
-	// Print update status
-	if updateCount == 0 {
-		fmt.Println("All libs already up to date!")
-	} else {
-		fmt.Println("Updated", updateCount, "/", depCount, "lib(s):")
-		fmt.Println(updatedOutput)
-	}
-
-	fmt.Println("")
-
-	// Print tag status
-	if tagCount == 0 {
-		fmt.Println("All tags already up to date!")
-	} else {
-		fmt.Println("Tagged", tagCount, "/", depCount, "lib(s):")
-		fmt.Println(taggedOutput)
-	}
-
-	fmt.Println("")
-
-	if action != "deploy" {
-		return
-	}
-
-	// Print deploys status
-	if deployedCount == 0 {
-		fmt.Println("No local changes to deploy in", depCount, "libs.")
-	} else {
-		fmt.Println("Deployed", deployedCount, "/", depCount, "lib(s):")
-		fmt.Println(deployedOutput)
-	}
-
-	fmt.Println("")
+	printStats(action, taggedOutput, updatedOutput, deployedOutput, tagCount, updateCount, deployedCount, depCount)
 }

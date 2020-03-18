@@ -138,3 +138,35 @@ func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.Strin
 	*action = command
 	return
 }
+
+func printStats(action, taggedOutput, updatedOutput, deployedOutput string, tagCount, updateCount, deployedCount, depCount int) {
+	// Print tag status
+	if tagCount == 0 {
+		fmt.Println("All tags already up to date!")
+	} else {
+		fmt.Println("Tagged", tagCount, "/", depCount, "lib(s):")
+		fmt.Println(taggedOutput)
+	}
+
+	// Print update status
+	if updateCount == 0 {
+		fmt.Println("All libs already up to date!")
+	} else {
+		fmt.Println("Updated", updateCount, "/", depCount, "lib(s):")
+		fmt.Println(updatedOutput)
+	}
+
+	if action != "deploy" {
+		return
+	}
+
+	// Print deploys status
+	if deployedCount == 0 {
+		fmt.Println("No local changes to deploy in", depCount, "libs.")
+	} else {
+		fmt.Println("Deployed", deployedCount, "/", depCount, "lib(s):")
+		fmt.Println(deployedOutput)
+	}
+
+	fmt.Println("")
+}
