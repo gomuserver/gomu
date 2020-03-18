@@ -88,8 +88,10 @@ func main() {
 		if action == "deploy" {
 			// TODO: Branch and PR? Diff?
 			lib.File.Deployed = lib.ModDeploy(tag)
-			deployedCount++
-			deployedOutput += itr.File.Path + "\n"
+			if lib.File.Deployed {
+				deployedCount++
+				deployedOutput += itr.File.Path
+			}
 		}
 
 		// Aggregate updated versions of previously parsed deps
