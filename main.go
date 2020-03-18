@@ -73,26 +73,18 @@ func main() {
 
 		if action == "pull" {
 			// Only git pull.
-			if itr.File.CheckoutBranch(branch) != nil {
-				itr.File.Output("Failed to checkout " + branch + " :(")
-			}
+			if performPull(branch, itr) {
+				updateCount++
+				updatedOutput += strconv.Itoa(updateCount) + ") " + itr.File.Path
 
-			if itr.File.Pull() == nil {
-				itr.File.Output("Pull successful!")
-			} else {
-				itr.File.Output("Failed to pull " + branch + " :(")
-			}
-
-			updateCount++
-			updatedOutput += strconv.Itoa(updateCount) + ") " + itr.File.Path
-
-			if debug { // Verbose?
-				popOutput, err := itr.File.CmdOutput("git", "stash", "pop")
-				if err == nil {
-					updatedOutput += popOutput
+				if debug { // Verbose?
+					popOutput, err := itr.File.CmdOutput("git", "stash", "pop")
+					if err == nil {
+						updatedOutput += popOutput
+					}
 				}
+				updatedOutput += "\n"
 			}
-			updatedOutput += "\n"
 
 			continue
 		}
@@ -173,5 +165,5 @@ func main() {
 		return
 	}
 
-	printStats(action, taggedOutput, updatedOutput, deployedOutput, tagCount, updateCount, deployedCount, depCount)
+	printStats(action, branch, taggedOutput, updatedOutput, deployedOutput, tagCount, updateCount, deployedCount, depCount)
 }

@@ -144,29 +144,47 @@ func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.Strin
 	return
 }
 
-func printStats(action, taggedOutput, updatedOutput, deployedOutput string, tagCount, updateCount, deployedCount, depCount int) {
+func performPull(branch string, itr *sorter.FileNode) (success bool) {
+	success = true
+
+	if itr.File.CheckoutBranch(branch) != nil {
+		itr.File.Output("Failed to checkout " + branch + " :(")
+		success = false
+	}
+
+	if itr.File.Pull() == nil {
+		itr.File.Output("Pull successful!")
+	} else {
+		itr.File.Output("Failed to pull " + branch + " :(")
+		success = false
+	}
+
+	return
+}
+
+func printStats(action, branch, taggedOutput, updatedOutput, deployedOutput string, tagCount, updateCount, deployedCount, depCount int) {
 	if action == "pull" {
 		// Print pull status
-		fmt.Println("Pulled latest versoin of ", updateCount, "/", depCount, "lib(s):")
+		fmt.Println("Pulled latest version of", branch, "in", updateCount, "/", depCount, "lib(s):")
 		fmt.Println(updatedOutput)
 		return
 	}
 
 	// Print update status
 	if updateCount == 0 {
-		fmt.Println("All libs already up to date!")
+		fmt.Println("All lib dependencies already up to date!")
 		fmt.Println("")
 	} else {
-		fmt.Println("Updated mod files in ", updateCount, "/", depCount, "lib(s):")
+		fmt.Println("Updated mod files in", updateCount, "/", depCount, "lib(s):")
 		fmt.Println(updatedOutput)
 	}
 
 	// Print tag status
 	if tagCount == 0 {
-		fmt.Println("All tags already up to date!")
+		fmt.Println("All lib tags already up to date!")
 		fmt.Println("")
 	} else {
-		fmt.Println("Updated tag in ", tagCount, "/", depCount, "lib(s):")
+		fmt.Println("Updated tag in", tagCount, "/", depCount, "lib(s):")
 		fmt.Println(taggedOutput)
 	}
 
@@ -179,7 +197,7 @@ func printStats(action, taggedOutput, updatedOutput, deployedOutput string, tagC
 		fmt.Println("No local changes to deploy in", depCount, "libs.")
 		fmt.Println("")
 	} else {
-		fmt.Println("Deployed new changes in ", deployedCount, "/", depCount, "lib(s):")
+		fmt.Println("Deployed new changes to", branch, "in ", deployedCount, "/", depCount, "lib(s):")
 		fmt.Println(deployedOutput)
 	}
 }
