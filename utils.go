@@ -170,6 +170,4 @@ func printStats(action, taggedOutput, updatedOutput, deployedOutput string, tagC
 		fmt.Println("Deployed", deployedCount, "/", depCount, "lib(s):")
 		fmt.Println(deployedOutput)
 	}
-
-	fmt.Println("")
 }
