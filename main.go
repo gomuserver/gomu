@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	common "github.com/hatchify/mod-common"
@@ -60,7 +61,7 @@ func main() {
 
 		// If we're just listing files, we don't need to do anything else :)
 		if action == "list" {
-			fmt.Println("(" + string(index) + ") " + itr.File.Path)
+			fmt.Println("(" + string(index) + ") " + itr.File.GetGoURL())
 			continue
 		}
 
@@ -72,7 +73,7 @@ func main() {
 			itr.File.CheckoutBranch(branch)
 			itr.File.Pull()
 			updateCount++
-			updatedOutput += itr.File.Path
+			updatedOutput += "(" + strconv.Itoa(updateCount) + ") " + itr.File.Path
 			popOutput, err := itr.File.CmdOutput("git", "stash", "pop")
 			if err == nil {
 				updatedOutput += popOutput
@@ -91,7 +92,7 @@ func main() {
 			lib.File.Deployed = lib.ModDeploy(tag)
 			if lib.File.Deployed {
 				deployedCount++
-				deployedOutput += "(" + string(deployedCount) + ") " + itr.File.Path + "\n"
+				deployedOutput += "(" + strconv.Itoa(deployedCount) + ") " + itr.File.Path + "\n"
 			}
 		}
 
@@ -103,7 +104,7 @@ func main() {
 			// Dep was updated
 			lib.File.Updated = true
 			updateCount++
-			updatedOutput += "(" + string(updateCount) + ") " + lib.File.Path + "\n"
+			updatedOutput += "(" + strconv.Itoa(updateCount) + ") " + lib.File.Path + "\n"
 		}
 
 		if strings.HasSuffix(strings.Trim(itr.File.Path, "/"), "-plugin") {
@@ -137,7 +138,7 @@ func main() {
 	for fileItr := fileHead; fileItr != nil; fileItr = fileItr.Next {
 		if fileItr.File.Tagged {
 			tagCount++
-			taggedOutput += "(" + string(tagCount) + ") " + fileItr.File.Path + " " + fileItr.File.Version + "\n"
+			taggedOutput += "(" + strconv.Itoa(tagCount) + ") " + fileItr.File.Path + " " + fileItr.File.Version + "\n"
 		}
 	}
 
