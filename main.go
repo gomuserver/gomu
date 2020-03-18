@@ -49,9 +49,9 @@ func main() {
 	updateCount := 0
 	tagCount := 0
 	deployedCount := 0
-	updatedOutput := "\n"
-	taggedOutput := "\n"
-	deployedOutput := "\n"
+	updatedOutput := ""
+	taggedOutput := ""
+	deployedOutput := ""
 
 	// Perform action on sorted libs
 	index := 0
@@ -60,7 +60,7 @@ func main() {
 
 		// If we're just listing files, we don't need to do anything else :)
 		if action == "list" {
-			fmt.Println("(", index, "/", depCount, ")", itr.File.Path)
+			fmt.Println("(" + string(index) + ") " + itr.File.Path)
 			continue
 		}
 
@@ -91,7 +91,7 @@ func main() {
 			lib.File.Deployed = lib.ModDeploy(tag)
 			if lib.File.Deployed {
 				deployedCount++
-				deployedOutput += itr.File.Path + "\n"
+				deployedOutput += "(" + string(deployedCount) + ") " + itr.File.Path + "\n"
 			}
 		}
 
@@ -103,7 +103,7 @@ func main() {
 			// Dep was updated
 			lib.File.Updated = true
 			updateCount++
-			updatedOutput += lib.File.Path + "\n"
+			updatedOutput += "(" + string(updateCount) + ") " + lib.File.Path + "\n"
 		}
 
 		if strings.HasSuffix(strings.Trim(itr.File.Path, "/"), "-plugin") {
@@ -137,7 +137,7 @@ func main() {
 	for fileItr := fileHead; fileItr != nil; fileItr = fileItr.Next {
 		if fileItr.File.Tagged {
 			tagCount++
-			taggedOutput += fileItr.File.Path + " " + fileItr.File.Version + "\n"
+			taggedOutput += "(" + string(tagCount) + ") " + fileItr.File.Path + " " + fileItr.File.Version + "\n"
 		}
 	}
 
