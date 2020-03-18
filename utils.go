@@ -194,7 +194,7 @@ func printStats(action, branch, taggedOutput, updatedOutput, deployedOutput, ins
 			fmt.Println("No local changes to deploy in", depCount, "libs.")
 			fmt.Println("")
 		} else {
-			fmt.Println("Deployed new changes to", branch, "in ", deployedCount, "/", depCount, "lib(s):")
+			fmt.Println("Deployed new changes to", branch, "in", deployedCount, "/", depCount, "lib(s):")
 			fmt.Println(deployedOutput)
 		}
 	} else if action == "install" {
