@@ -121,7 +121,7 @@ func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.Strin
 	// Check for supported actions
 	command = strings.ToLower(command)
 	switch command {
-	case "sync", "list", "deploy", "pull":
+	case "sync", "list", "deploy", "pull", "install":
 		// Supported actions
 	case "help":
 		// exit without error
@@ -162,7 +162,7 @@ func performPull(branch string, itr *sorter.FileNode) (success bool) {
 	return
 }
 
-func printStats(action, branch, taggedOutput, updatedOutput, deployedOutput string, tagCount, updateCount, deployedCount, depCount int) {
+func printStats(action, branch, taggedOutput, updatedOutput, deployedOutput, installedOutput string, tagCount, updateCount, deployedCount, installedCount, depCount int) {
 	if action == "pull" {
 		// Print pull status
 		fmt.Println("Pulled latest version of", branch, "in", updateCount, "/", depCount, "lib(s):")
@@ -188,16 +188,23 @@ func printStats(action, branch, taggedOutput, updatedOutput, deployedOutput stri
 		fmt.Println(taggedOutput)
 	}
 
-	if action != "deploy" {
-		return
-	}
-
-	// Print deploys status
-	if deployedCount == 0 {
-		fmt.Println("No local changes to deploy in", depCount, "libs.")
-		fmt.Println("")
-	} else {
-		fmt.Println("Deployed new changes to", branch, "in ", deployedCount, "/", depCount, "lib(s):")
-		fmt.Println(deployedOutput)
+	if action == "deploy" {
+		// Print deploy status
+		if deployedCount == 0 {
+			fmt.Println("No local changes to deploy in", depCount, "libs.")
+			fmt.Println("")
+		} else {
+			fmt.Println("Deployed new changes to", branch, "in ", deployedCount, "/", depCount, "lib(s):")
+			fmt.Println(deployedOutput)
+		}
+	} else if action == "install" {
+		// Print install status
+		if installedCount == 0 {
+			fmt.Println("No packages installed in", depCount, "libs.")
+			fmt.Println("")
+		} else {
+			fmt.Println("Installed", deployedCount, "/", depCount, "lib(s):")
+			fmt.Println(deployedOutput)
+		}
 	}
 }

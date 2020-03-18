@@ -50,9 +50,11 @@ func main() {
 	updateCount := 0
 	tagCount := 0
 	deployedCount := 0
+	installedCount := 0
 	updatedOutput := ""
 	taggedOutput := ""
 	deployedOutput := ""
+	installedOutput := ""
 
 	// Perform action on sorted libs
 	index := 0
@@ -140,6 +142,21 @@ func main() {
 				itr.File.Version = tag
 			}
 		}
+
+		if action == "install" {
+			if itr.File.Updated || itr.File.Tagged || itr.File.Deployed {
+				// Attempt installation
+				itr.File.Output("Installing...")
+				if itr.File.RunCmd("go", "install", "-trimpath") == nil {
+					itr.File.Installed = true
+					installedCount++
+					installedOutput = strconv.Itoa(installedCount) + ") Successfully installed"
+					itr.File.Output("Install successful!")
+				} else {
+					itr.File.Output("Install failed :(")
+				}
+			}
+		}
 	}
 
 	// Resume working directory
@@ -165,5 +182,5 @@ func main() {
 		return
 	}
 
-	printStats(action, branch, taggedOutput, updatedOutput, deployedOutput, tagCount, updateCount, deployedCount, depCount)
+	printStats(action, branch, taggedOutput, updatedOutput, deployedOutput, installedOutput, tagCount, updateCount, deployedCount, installedCount, depCount)
 }
