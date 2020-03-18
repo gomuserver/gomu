@@ -145,7 +145,7 @@ func printStats(action, taggedOutput, updatedOutput, deployedOutput string, tagC
 		fmt.Println("All tags already up to date!")
 		fmt.Println("")
 	} else {
-		fmt.Println("Tagged", tagCount, "/", depCount, "lib(s):")
+		fmt.Println("Updated tag in ", tagCount, "/", depCount, "lib(s):")
 		fmt.Println(taggedOutput)
 	}
 
@@ -154,7 +154,7 @@ func printStats(action, taggedOutput, updatedOutput, deployedOutput string, tagC
 		fmt.Println("All libs already up to date!")
 		fmt.Println("")
 	} else {
-		fmt.Println("Updated", updateCount, "/", depCount, "lib(s):")
+		fmt.Println("Updated mod files in ", updateCount, "/", depCount, "lib(s):")
 		fmt.Println(updatedOutput)
 	}
 
@@ -167,7 +167,7 @@ func printStats(action, taggedOutput, updatedOutput, deployedOutput string, tagC
 		fmt.Println("No local changes to deploy in", depCount, "libs.")
 		fmt.Println("")
 	} else {
-		fmt.Println("Deployed", deployedCount, "/", depCount, "lib(s):")
+		fmt.Println("Deployed new changes in ", deployedCount, "/", depCount, "lib(s):")
 		fmt.Println(deployedOutput)
 	}
 }
