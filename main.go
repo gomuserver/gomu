@@ -61,7 +61,7 @@ func main() {
 
 		// If we're just listing files, we don't need to do anything else :)
 		if action == "list" {
-			fmt.Println(string(index) + ") " + itr.File.GetGoURL())
+			fmt.Println(strconv.Itoa(index) + ") " + itr.File.GetGoURL())
 			continue
 		}
 
