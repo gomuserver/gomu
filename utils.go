@@ -46,7 +46,12 @@ func getLibsInDirectory(dir string) (libs sorter.StringArray) {
 	// Parse files from exec "ls"
 	libs = strings.Split(string(stdout), "\n")
 	for index := range libs {
-		libs[index] = path.Join(dir, libs[index])
+		switch libs[index] {
+		case ".", "..", dir:
+			// Ignore non-repositories
+		default:
+			libs[index] = path.Join(dir, libs[index])
+		}
 	}
 
 	return
