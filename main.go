@@ -153,7 +153,6 @@ func main() {
 	// Print update status
 	if updateCount == 0 {
 		fmt.Println("All libs already up to date!")
-		fmt.Println("")
 	} else {
 		fmt.Println("Updated", updateCount, "/", depCount, "lib(s):")
 		fmt.Println(updatedOutput)
@@ -164,7 +163,6 @@ func main() {
 	// Print tag status
 	if tagCount == 0 {
 		fmt.Println("All tags already up to date!")
-		fmt.Println("")
 	} else {
 		fmt.Println("Tagged", tagCount, "/", depCount, "lib(s):")
 		fmt.Println(taggedOutput)
