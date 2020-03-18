@@ -68,6 +68,8 @@ func main() {
 		// Separate output
 		fmt.Println("")
 		fmt.Println("(", index, "/", depCount, ")", itr.File.Path)
+
+		itr.File.Output("Checking out " + branch + "...")
 		itr.File.CheckoutBranch(branch)
 
 		if action == "pull" {
@@ -101,7 +103,7 @@ func main() {
 		lib.ModAddDeps(fileHead)
 
 		// Update the dep if necessary
-		if err := lib.ModUpdate("Update mod files. " + tag); err == nil {
+		if err := lib.ModUpdate(branch, "Update mod files. "+tag); err == nil {
 			// Dep was updated
 			lib.File.Updated = true
 			updateCount++
