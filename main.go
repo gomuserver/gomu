@@ -40,7 +40,7 @@ func main() {
 
 	// Sort libs
 	fileHead, depCount := libs.SortedDependingOnAny(filterDeps)
-	if len(filterDeps) == 0 {
+	if len(filterDeps) == 0 || len(filterDeps[0]) == 0 {
 		fmt.Println("Performing", action, "on", depCount, "lib(s)")
 	} else {
 		fmt.Println("Performing", action, "on", depCount, "lib(s) depending on", filterDeps)
@@ -77,17 +77,23 @@ func main() {
 				itr.File.Output("Failed to checkout " + branch + " :(")
 			}
 
-			if itr.File.Pull() != nil {
+			if itr.File.Pull() == nil {
+				itr.File.Output("Pull successful!")
+			} else {
 				itr.File.Output("Failed to pull " + branch + " :(")
 			}
 
 			updateCount++
 			updatedOutput += strconv.Itoa(updateCount) + ") " + itr.File.Path
-			popOutput, err := itr.File.CmdOutput("git", "stash", "pop")
-			if err == nil {
-				updatedOutput += popOutput
+
+			if debug { // Verbose?
+				popOutput, err := itr.File.CmdOutput("git", "stash", "pop")
+				if err == nil {
+					updatedOutput += popOutput
+				}
 			}
 			updatedOutput += "\n"
+
 			continue
 		}
 

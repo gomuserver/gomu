@@ -145,13 +145,11 @@ func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.Strin
 }
 
 func printStats(action, taggedOutput, updatedOutput, deployedOutput string, tagCount, updateCount, deployedCount, depCount int) {
-	// Print tag status
-	if tagCount == 0 {
-		fmt.Println("All tags already up to date!")
-		fmt.Println("")
-	} else {
-		fmt.Println("Updated tag in ", tagCount, "/", depCount, "lib(s):")
-		fmt.Println(taggedOutput)
+	if action == "pull" {
+		// Print pull status
+		fmt.Println("Pulled latest versoin of ", updateCount, "/", depCount, "lib(s):")
+		fmt.Println(updatedOutput)
+		return
 	}
 
 	// Print update status
@@ -161,6 +159,15 @@ func printStats(action, taggedOutput, updatedOutput, deployedOutput string, tagC
 	} else {
 		fmt.Println("Updated mod files in ", updateCount, "/", depCount, "lib(s):")
 		fmt.Println(updatedOutput)
+	}
+
+	// Print tag status
+	if tagCount == 0 {
+		fmt.Println("All tags already up to date!")
+		fmt.Println("")
+	} else {
+		fmt.Println("Updated tag in ", tagCount, "/", depCount, "lib(s):")
+		fmt.Println(taggedOutput)
 	}
 
 	if action != "deploy" {
