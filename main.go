@@ -14,6 +14,7 @@ func main() {
 	var (
 		action string
 		tag    string
+		branch string
 
 		filterDeps sort.StringArray
 		targetDirs sort.StringArray
@@ -22,7 +23,7 @@ func main() {
 	)
 
 	// Parse command line values, check supported functions, set defaults
-	checkArgs(&action, &tag, &filterDeps, &targetDirs, &debug)
+	checkArgs(&action, &branch, &tag, &filterDeps, &targetDirs, &debug)
 
 	// Get all libs within target dirs
 	libs := getLibsInAny(targetDirs)
@@ -66,6 +67,19 @@ func main() {
 		// Separate output
 		fmt.Println("")
 		fmt.Println("(", index, "/", depCount, ")", itr.File.Path)
+		if action == "pull" {
+			// Only git pull.
+			itr.File.CheckoutBranch(branch)
+			itr.File.Pull()
+			updateCount++
+			updatedOutput += itr.File.Path
+			popOutput, err := itr.File.CmdOutput("git", "stash", "pop")
+			if err == nil {
+				updatedOutput += popOutput
+			}
+			updatedOutput += "\n"
+			continue
+		}
 
 		// Create sync lib ref from dep file
 		var lib sync.Library
@@ -79,7 +93,7 @@ func main() {
 		}
 
 		// Aggregate updated versions of previously parsed deps
-		lib.ModSetDeps()
+		lib.ModAddDeps(fileHead)
 
 		// Update the dep if necessary
 		if err := lib.ModUpdate("Update mod files. " + tag); err == nil {
@@ -109,10 +123,13 @@ func main() {
 		}
 	}
 
-	// Resume working directory
-	for i := range libs {
-		f.Path = libs[i]
-		f.StashPop()
+	if action != "deploy" {
+		// Resume working directory
+		for i := range libs {
+			f.Path = libs[i]
+			f.CheckoutBranch(branch)
+			f.StashPop()
+		}
 	}
 
 	// Count files updated and prepare status output

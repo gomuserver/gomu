@@ -77,16 +77,17 @@ func readInput() {
 }
 
 func exit(status int) {
-	fmt.Println("\nUsage: gomu <flags> <command: [list|sync|deploy]> | gomu -action=<command [list|sync|deploy]> <other flags>")
+	fmt.Println("\nUsage: gomu <flags> <command: [list|sync|deploy|pull]> | gomu -action=<command [list|sync|deploy]> <other flags>")
 	fmt.Println("\nNote: command must be a single token set by action, or trailing optional falgs")
 	fmt.Println("\nView README.md @ https://github.com/hatchify/gomu")
 	fmt.Println("")
 	os.Exit(status)
 }
 
-func checkArgs(action, tag *string, filterDeps, targetDirs *sorter.StringArray, debug *bool) {
+func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.StringArray, debug *bool) {
 	// Get optional args for forcing a tag number and filtering target deps
-	flag.StringVar(action, "action", "", "function to perform [list|sync|deploy]")
+	flag.StringVar(action, "action", "", "function to perform [list|sync|deploy|pull]")
+	flag.StringVar(branch, "branch", "master", "branch to user when pull (and eventually pull request) are used. Default to master (eventually default to current)")
 	flag.StringVar(tag, "tag", "", "optional value to set for git tag")
 	flag.BoolVar(debug, "debug", false, "optional value to get debug output")
 	flag.Var(filterDeps, "dep", "optional dependency filter: accepts multiple -dep flags to only list/sort libs which depend on one of the provided filters")
@@ -115,7 +116,7 @@ func checkArgs(action, tag *string, filterDeps, targetDirs *sorter.StringArray, 
 	// Check for supported actions
 	command = strings.ToLower(command)
 	switch command {
-	case "sync", "list", "deploy":
+	case "sync", "list", "deploy", "pull":
 		// Supported actions
 	case "help":
 		// exit without error
