@@ -91,7 +91,7 @@ func main() {
 			lib.File.Deployed = lib.ModDeploy(tag)
 			if lib.File.Deployed {
 				deployedCount++
-				deployedOutput += itr.File.Path
+				deployedOutput += itr.File.Path + "\n"
 			}
 		}
 
