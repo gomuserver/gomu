@@ -1,5 +1,5 @@
-#GoMu - Go Mod Utils
-GoMu is intended to make working with go.mod sane.
+#gomu - Go Mod Utils
+gomu is intended to make working with go.mod sane.
 
 #1) list: Sorted dependencies
 List all dependencies in order of the dependency chain, optionally warning of dependency cycles
