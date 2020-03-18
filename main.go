@@ -126,13 +126,11 @@ func main() {
 		}
 	}
 
-	if action != "deploy" {
-		// Resume working directory
-		for i := range libs {
-			f.Path = libs[i]
-			f.CheckoutBranch(branch)
-			f.StashPop()
-		}
+	// Resume working directory
+	for i := range libs {
+		f.Path = libs[i]
+		f.CheckoutBranch(branch)
+		f.StashPop()
 	}
 
 	// Count files updated and prepare status output
