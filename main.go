@@ -10,6 +10,8 @@ import (
 	sync "github.com/hatchify/mod-sync"
 )
 
+var version = "undefined"
+
 func main() {
 	// Flags/Args
 	var (

@@ -123,6 +123,9 @@ func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.Strin
 	switch command {
 	case "sync", "list", "deploy", "pull":
 		// Supported actions
+	case "version":
+		fmt.Println(version)
+		os.Exit(0)
 	case "help":
 		// exit without error
 		exit(0)
