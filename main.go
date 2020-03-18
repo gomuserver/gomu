@@ -68,9 +68,10 @@ func main() {
 		// Separate output
 		fmt.Println("")
 		fmt.Println("(", index, "/", depCount, ")", itr.File.Path)
+		itr.File.CheckoutBranch(branch)
+
 		if action == "pull" {
 			// Only git pull.
-			itr.File.CheckoutBranch(branch)
 			itr.File.Pull()
 			updateCount++
 			updatedOutput += strconv.Itoa(updateCount) + ") " + itr.File.Path
