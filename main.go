@@ -159,6 +159,8 @@ func main() {
 		fmt.Println(updatedOutput)
 	}
 
+	fmt.Println("")
+
 	// Print tag status
 	if tagCount == 0 {
 		fmt.Println("All tags already up to date!")
@@ -168,6 +170,8 @@ func main() {
 		fmt.Println(taggedOutput)
 	}
 
+	fmt.Println("")
+
 	if action != "deploy" {
 		return
 	}
@@ -175,9 +179,10 @@ func main() {
 	// Print deploys status
 	if deployedCount == 0 {
 		fmt.Println("No local changes to deploy in", depCount, "libs.")
-		fmt.Println("")
 	} else {
 		fmt.Println("Deployed", deployedCount, "/", depCount, "lib(s):")
 		fmt.Println(deployedOutput)
 	}
+
+	fmt.Println("")
 }
