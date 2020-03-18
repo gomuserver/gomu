@@ -175,7 +175,7 @@ func main() {
 		fmt.Println("No local changes to deploy in", depCount, "libs.")
 		fmt.Println("")
 	} else {
-		fmt.Println("Tagged", tagCount, "/", depCount, "lib(s):")
-		fmt.Println(taggedOutput)
+		fmt.Println("Deployed", deployedCount, "/", depCount, "lib(s):")
+		fmt.Println(deployedOutput)
 	}
 }
