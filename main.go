@@ -70,11 +70,17 @@ func main() {
 		fmt.Println("(", index, "/", depCount, ")", itr.File.Path)
 
 		itr.File.Output("Checking out " + branch + "...")
-		itr.File.CheckoutBranch(branch)
 
 		if action == "pull" {
 			// Only git pull.
-			itr.File.Pull()
+			if itr.File.CheckoutBranch(branch) != nil {
+				itr.File.Output("Failed to checkout " + branch + " :(")
+			}
+
+			if itr.File.Pull() != nil {
+				itr.File.Output("Failed to pull " + branch + " :(")
+			}
+
 			updateCount++
 			updatedOutput += strconv.Itoa(updateCount) + ") " + itr.File.Path
 			popOutput, err := itr.File.CmdOutput("git", "stash", "pop")
@@ -83,6 +89,14 @@ func main() {
 			}
 			updatedOutput += "\n"
 			continue
+		}
+
+		if itr.File.CheckoutOrCreateBranch(branch) != nil {
+			itr.File.Output("Failed to checkout " + branch + " :(")
+		}
+
+		if itr.File.Pull() != nil {
+			itr.File.Output("Failed to pull " + branch + " :(")
 		}
 
 		// Create sync lib ref from dep file
