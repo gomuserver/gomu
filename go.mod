@@ -4,5 +4,5 @@ go 1.14
 
 require (
 	github.com/hatchify/mod-sort v0.4.1
-	github.com/hatchify/mod-sync v0.4.3
+	github.com/hatchify/mod-sync v0.4.5
 )
