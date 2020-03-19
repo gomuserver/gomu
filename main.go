@@ -101,15 +101,22 @@ func main() {
 				stats.updateCount++
 				stats.updatedOutput += strconv.Itoa(stats.updateCount) + ") " + itr.File.Path
 
-				if debug { // Verbose?
-					popOutput, err := itr.File.CmdOutput("git", "stash", "pop")
-					if err == nil {
-						stats.updatedOutput += popOutput
-					}
-				}
 				stats.updatedOutput += "\n"
 			}
 
+			continue
+		}
+
+		// Create sync lib ref from dep file
+		var lib sync.Library
+		lib.File = itr.File
+
+		if action == "reset" {
+			lib.File.Output("Checking local changes...")
+			lib.File.StashPop()
+			lib.File.RunCmd("git", "checkout", "master", "go.mod")
+			lib.File.RunCmd("git", "checkout", "master", "go.sum")
+			lib.File.Output("Reverted mod files to master ref.")
 			continue
 		}
 
@@ -120,10 +127,6 @@ func main() {
 		if itr.File.Pull() != nil {
 			itr.File.Output("Failed to pull " + branch + " :(")
 		}
-
-		// Create sync lib ref from dep file
-		var lib sync.Library
-		lib.File = itr.File
 
 		if action == "deploy" {
 			// TODO: Branch and PR? Diff?
@@ -140,8 +143,8 @@ func main() {
 
 		if action == "replace-local" {
 			// Append local replacements for all libs in lib.updatedDeps
-			lib.File.Output("Replacing deps with local directories...")
-			if lib.SetLocalDeps() {
+			lib.File.Output("Setting local replacements...")
+			if lib.ModReplaceLocal() {
 				lib.File.Updated = true
 				stats.updateCount++
 				stats.updatedOutput += strconv.Itoa(stats.updateCount) + ") " + lib.File.Path + "\n"
@@ -180,37 +183,10 @@ func main() {
 				itr.File.Version = tag
 			}
 		}
-
-		if action == "install" {
-			// Attempt installation
-			itr.File.Output("Building...")
-			if itr.File.RunCmd("go", "build", "-o", "testartifact.test") != nil {
-				itr.File.Output("Nothing to build")
-				continue
-			}
-
-			if itr.File.RunCmd("rm", "testartifact.test") != nil {
-				itr.File.Output("Nothing to install")
-				continue
-			}
-
-			if itr.File.RunCmd("go", "install", "-trimpath") == nil {
-				itr.File.Installed = true
-				stats.installedCount++
-				stats.installedOutput += strconv.Itoa(stats.installedCount) + ") " + itr.File.GetGoURL()
-				itr.File.Output("Install successful!")
-			} else {
-				itr.File.Output("Install failed :(")
-			}
-		}
 	}
 
 	// Cleanup
-	for i := range libs {
-		f.Path = libs[i]
-		f.CheckoutBranch(branch)
-		f.StashPop()
-	}
+	cleanupStash(libs)
 
 	if nameOnly {
 		// Print names and quit

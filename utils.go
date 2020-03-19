@@ -93,11 +93,15 @@ func readInput() {
 	}
 }
 
-func exit(status int) {
-	fmt.Println("\nUsage: gomu <flags> <command: [list|sync|deploy|pull]> | gomu -action=<command [list|sync|deploy]> <other flags>")
-	fmt.Println("\nNote: command must be a single token set by action, or trailing optional falgs")
+func showHelp() {
+	fmt.Println("\nUsage: gomu <flags> <command: [list|pull|replace-local]> | gomu -action <command: [list|pull|replace-local]> <other flags>")
+	fmt.Println("\nNote: command must be a single token set by action, or trailing optional flags")
 	fmt.Println("\nView README.md @ https://github.com/hatchify/gomu")
 	fmt.Println("")
+}
+
+func exit(status int) {
+	showHelp()
 	os.Exit(status)
 }
 
@@ -180,7 +184,7 @@ func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.Strin
 	// Check for supported actions
 	command = strings.ToLower(command)
 	switch command {
-	case "list", "pull", "replace-local":
+	case "list", "pull", "reset", "replace-local":
 		// Public commands
 
 	case "sync", "deploy":
