@@ -13,6 +13,18 @@ import (
 	sorter "github.com/hatchify/mod-sort"
 )
 
+var version = "undefined"
+var nameOnly bool
+
+// Println will print line if nameOnly isn't set
+func Println(a ...interface{}) (n int, err error) {
+	if !nameOnly {
+		n, err = fmt.Println(a...)
+	}
+
+	return
+}
+
 // Parses arguments to load target directories
 // Returns current lib if no args provided
 func getTargetDirs() (targetLibs sorter.StringArray) {
@@ -89,6 +101,43 @@ func exit(status int) {
 	os.Exit(status)
 }
 
+func showWarningOrQuit(message string) {
+	if !showWarning(message) {
+		Println("Exiting...")
+		exit(0)
+	}
+}
+
+func showWarning(message string) (ok bool) {
+	if nameOnly {
+		// Don't show warnings for name only
+		return true
+	}
+
+	var err error
+	var text string
+	reader := bufio.NewReader(os.Stdin)
+
+	for err == nil {
+		if text = strings.TrimSpace(text); len(text) > 0 {
+			switch text {
+			case "y", "Y", "Yes", "yes", "YES", "ok", "OK", "Ok":
+				ok = true
+				return
+			default:
+				Println("Nevermind then! :)")
+				return
+			}
+		}
+
+		Println(message + " [y|yes|ok]: ")
+		text, err = reader.ReadString('\n')
+	}
+
+	Println("Oops... Something went wrong.")
+	return
+}
+
 func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.StringArray, debug, verbose, nameOnly *bool) {
 	// Get optional args for forcing a tag number, setting branches, and passing actions
 	flag.StringVar(action, "action", "", "function to perform [list|sync|deploy|pull]")
@@ -130,7 +179,10 @@ func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.Strin
 	// Check for supported actions
 	command = strings.ToLower(command)
 	switch command {
-	case "sync", "list", "deploy", "pull":
+	case "list", "pull", "replace-local":
+		// Public commands
+
+	case "sync", "deploy":
 		// Supported actions. Fall through
 
 	case "version":
@@ -175,51 +227,4 @@ func performPull(branch string, itr *sorter.FileNode) (success bool) {
 	}
 
 	return
-}
-
-func printStats(action, branch, taggedOutput, updatedOutput, deployedOutput, installedOutput string, tagCount, updateCount, deployedCount, installedCount, depCount int) {
-	if action == "pull" {
-		// Print pull status
-		fmt.Println("Pulled latest version of", branch, "in", updateCount, "/", depCount, "lib(s):")
-		fmt.Println(updatedOutput)
-		return
-	}
-
-	// Print update status
-	if updateCount == 0 {
-		fmt.Println("All lib dependencies already up to date!")
-		fmt.Println("")
-	} else {
-		fmt.Println("Updated mod files in", updateCount, "/", depCount, "lib(s):")
-		fmt.Println(updatedOutput)
-	}
-
-	// Print tag status
-	if tagCount == 0 {
-		fmt.Println("All lib tags already up to date!")
-		fmt.Println("")
-	} else {
-		fmt.Println("Updated tag in", tagCount, "/", depCount, "lib(s):")
-		fmt.Println(taggedOutput)
-	}
-
-	if action == "deploy" {
-		// Print deploy status
-		if deployedCount == 0 {
-			fmt.Println("No local changes to deploy in", depCount, "libs.")
-			fmt.Println("")
-		} else {
-			fmt.Println("Deployed new changes to", branch, "in", deployedCount, "/", depCount, "lib(s):")
-			fmt.Println(deployedOutput)
-		}
-	} else if action == "install" {
-		// Print install status
-		if installedCount == 0 {
-			fmt.Println("No packages installed in", depCount, "libs.")
-			fmt.Println("")
-		} else {
-			fmt.Println("Installed", deployedCount, "/", depCount, "lib(s):")
-			fmt.Println(deployedOutput)
-		}
-	}
 }
