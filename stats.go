@@ -28,7 +28,7 @@ func (stats outputStats) format(action, branch string) (output string) {
 
 	if action == "replace-local" {
 		// Print replacement status
-		output += "Pulled latest version of " + branch + " in " + strconv.Itoa(stats.updateCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):\n"
+		output += "Replaced local dependencies in " + strconv.Itoa(stats.updateCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):\n"
 		output += stats.updatedOutput
 		return
 	}
@@ -42,6 +42,8 @@ func (stats outputStats) format(action, branch string) (output string) {
 		output += stats.updatedOutput
 	}
 
+	output += "\n"
+
 	// Print tag status
 	if stats.tagCount == 0 {
 		output += "All lib tags already up to date!"
@@ -50,6 +52,8 @@ func (stats outputStats) format(action, branch string) (output string) {
 		output += "Updated tag in " + strconv.Itoa(stats.tagCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):\n"
 		output += stats.taggedOutput
 	}
+
+	output += "\n"
 
 	if action == "deploy" {
 		// Print deploy status
