@@ -7,3 +7,6 @@ require (
 	github.com/hatchify/mod-sort v0.4.76
 	github.com/hatchify/mod-sync v0.4.78
 )
+
+// Separate replacements //
+// Local Replacements
