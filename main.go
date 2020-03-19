@@ -140,12 +140,14 @@ func main() {
 
 		if action == "replace-local" {
 			// Append local replacements for all libs in lib.updatedDeps
-			lib.File.Output("Setting local replacements...")
+			lib.File.Output("Replacing deps with local directories...")
 			if lib.SetLocalDeps() {
 				lib.File.Updated = true
 				stats.updateCount++
 				stats.updatedOutput += strconv.Itoa(stats.updateCount) + ") " + lib.File.Path + "\n"
-				lib.File.Output("Local Deps set!")
+				lib.File.Output("Local replacements set!")
+			} else {
+				lib.File.Output("Failed to set local deps :(")
 			}
 			continue
 		}
