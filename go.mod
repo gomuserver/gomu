@@ -3,9 +3,9 @@ module github.com/hatchify/gomu
 go 1.14
 
 require (
-	github.com/hatchify/mod-common v0.4.83
-	github.com/hatchify/mod-sort v0.4.86
-	github.com/hatchify/mod-sync v0.4.90
+	github.com/hatchify/mod-common v0.4.84
+	github.com/hatchify/mod-sort v0.4.87
+	github.com/hatchify/mod-sync v0.4.91
 )
 
 // *** Separate Local Deps *** \\
