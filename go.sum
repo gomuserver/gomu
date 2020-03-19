@@ -1,6 +1,6 @@
-github.com/hatchify/mod-common v0.4.76 h1:y/zAt1OVgB4TzQLzIXrP0VUf5QKfPCluOOpG8CInDQg=
-github.com/hatchify/mod-common v0.4.76/go.mod h1:2FN3hgxxHLDz+hy3adP+PyyrdUYX1iSXsh5AccQuvIY=
-github.com/hatchify/mod-sort v0.4.76 h1:415w9SvL0pf16x+nqVrUjhHJZDhLk84balTC3AkiVQE=
-github.com/hatchify/mod-sort v0.4.76/go.mod h1:dl/VRJK0xQrywhBgeR7VcK+PgKQDnEiO0pcZoGsvdjs=
-github.com/hatchify/mod-sync v0.4.78 h1:crvQ42FByrqt7QlMprUQkRk5hm+/bMONIbJK7itnKCE=
-github.com/hatchify/mod-sync v0.4.78/go.mod h1:/tgkkLGZriVHB6R9L7u/OQeKIQw0Y/GN8IjaDNFphQo=
+github.com/hatchify/mod-common v0.4.77 h1:Sop5mR1OrgBBgnoWpsvMKX0YAlqayNyY6BcRmQXOMGU=
+github.com/hatchify/mod-common v0.4.77/go.mod h1:2FN3hgxxHLDz+hy3adP+PyyrdUYX1iSXsh5AccQuvIY=
+github.com/hatchify/mod-sort v0.4.77 h1:GgHzdw8x6m+nCAKx7McZtRuS8toMXhfm9/3q3Knmjkw=
+github.com/hatchify/mod-sort v0.4.77/go.mod h1:RFXeOZbiZdnE9IFUklmJyYketxqEMlYSXL308A3/rJo=
+github.com/hatchify/mod-sync v0.4.79 h1:YtOgtn+W8Li8OtMCa22P9CVt/ACw0OhlU92u3lCH4hQ=
+github.com/hatchify/mod-sync v0.4.79/go.mod h1:DmmY6VVqqCx46qjwb+Xd6JFJpZX4sL27VT9Gd2rYeyQ=
