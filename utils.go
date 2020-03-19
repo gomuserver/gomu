@@ -130,7 +130,8 @@ func showWarning(message string) (ok bool) {
 			}
 		}
 
-		Println(message + " [y|yes|ok]: ")
+		// No newline. name-only already exited above
+		fmt.Print(message + " [y|yes|ok]: ")
 		text, err = reader.ReadString('\n')
 	}
 

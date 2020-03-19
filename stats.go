@@ -21,14 +21,14 @@ type outputStats struct {
 func (stats outputStats) format(action, branch string) (output string) {
 	if action == "pull" {
 		// Print pull status
-		output += "Pulled latest version of " + branch + " in " + strconv.Itoa(stats.updateCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):"
+		output += "Pulled latest version of " + branch + " in " + strconv.Itoa(stats.updateCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):\n"
 		output += stats.updatedOutput
 		return
 	}
 
 	if action == "replace-local" {
 		// Print replacement status
-		output += "Pulled latest version of " + branch + " in " + strconv.Itoa(stats.updateCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):"
+		output += "Pulled latest version of " + branch + " in " + strconv.Itoa(stats.updateCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):\n"
 		output += stats.updatedOutput
 		return
 	}
@@ -38,7 +38,7 @@ func (stats outputStats) format(action, branch string) (output string) {
 		output += "All lib dependencies already up to date!"
 		output += ""
 	} else {
-		output += "Updated mod files in " + strconv.Itoa(stats.updateCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):"
+		output += "Updated mod files in " + strconv.Itoa(stats.updateCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):\n"
 		output += stats.updatedOutput
 	}
 
@@ -47,26 +47,26 @@ func (stats outputStats) format(action, branch string) (output string) {
 		output += "All lib tags already up to date!"
 		output += ""
 	} else {
-		output += "Updated tag in " + strconv.Itoa(stats.tagCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):"
+		output += "Updated tag in " + strconv.Itoa(stats.tagCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):\n"
 		output += stats.taggedOutput
 	}
 
 	if action == "deploy" {
 		// Print deploy status
 		if stats.deployedCount == 0 {
-			output += "No local changes to deploy in " + strconv.Itoa(stats.depCount) + " lib(s)."
+			output += "No local changes to deploy in " + strconv.Itoa(stats.depCount) + " lib(s).\n"
 			output += ""
 		} else {
-			output += "Deployed new changes to <" + branch + "> in " + strconv.Itoa(stats.deployedCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):"
+			output += "Deployed new changes to <" + branch + "> in " + strconv.Itoa(stats.deployedCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):\n"
 			output += stats.deployedOutput
 		}
 	} else if action == "install" {
 		// Print install status
 		if stats.installedCount == 0 {
-			output += "No packages installed in " + strconv.Itoa(stats.depCount) + " libs."
+			output += "No packages installed in " + strconv.Itoa(stats.depCount) + " lib(s).\n"
 			output += ""
 		} else {
-			output += "Installed " + strconv.Itoa(stats.deployedCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):"
+			output += "Installed " + strconv.Itoa(stats.deployedCount) + "/" + strconv.Itoa(stats.depCount) + " lib(s):\n"
 			output += stats.deployedOutput
 		}
 	}
