@@ -11,6 +11,16 @@ import (
 )
 
 var version = "undefined"
+var nameOnly bool
+
+// Println will print line if nameOnly isn't set
+func Println(a ...interface{}) (n int, err error) {
+	if !nameOnly {
+		n, err = fmt.Println(a...)
+	}
+
+	return
+}
 
 func main() {
 	// Flags/Args
@@ -22,15 +32,16 @@ func main() {
 		filterDeps sort.StringArray
 		targetDirs sort.StringArray
 
-		debug bool
+		debug   bool
+		verbose bool
 	)
 
 	// Parse command line values, check supported functions, set defaults
-	checkArgs(&action, &branch, &tag, &filterDeps, &targetDirs, &debug)
+	checkArgs(&action, &branch, &tag, &filterDeps, &targetDirs, &debug, &verbose, &nameOnly)
 
 	// Get all libs within target dirs
 	libs := getLibsInAny(targetDirs)
-	fmt.Println("Scanning", len(libs)+1, "file(s) in", targetDirs)
+	Println("Scanning", len(libs)+1, "file(s) in", targetDirs)
 
 	// Clean working directory
 	var f common.FileWrapper
@@ -43,9 +54,9 @@ func main() {
 	// Sort libs
 	fileHead, depCount := libs.SortedDependingOnAny(filterDeps)
 	if len(filterDeps) == 0 || len(filterDeps[0]) == 0 {
-		fmt.Println("Performing", action, "on", depCount, "lib(s)")
+		Println("Performing", action, "on", depCount, "lib(s)")
 	} else {
-		fmt.Println("Performing", action, "on", depCount, "lib(s) depending on", filterDeps)
+		Println("Performing", action, "on", depCount, "lib(s) depending on", filterDeps)
 	}
 
 	// Output Stats
@@ -65,19 +76,20 @@ func main() {
 
 		// If we're just listing files, we don't need to do anything else :)
 		if action == "list" {
-			fmt.Println(strconv.Itoa(index) + ") " + itr.File.GetGoURL())
+			Println(strconv.Itoa(index) + ") " + itr.File.GetGoURL())
 			continue
 		}
 
 		// Separate output
-		fmt.Println("")
-		fmt.Println("(", index, "/", depCount, ")", itr.File.Path)
+		Println("")
+		Println("(", index, "/", depCount, ")", itr.File.Path)
 
 		itr.File.Output("Checking out " + branch + "...")
 
 		if action == "pull" {
 			// Only git pull.
 			if performPull(branch, itr) {
+				itr.File.Updated = true
 				updateCount++
 				updatedOutput += strconv.Itoa(updateCount) + ") " + itr.File.Path
 
@@ -135,6 +147,8 @@ func main() {
 		if len(tag) > 0 || lib.ShouldTag() {
 			itr.File.Version = lib.TagLib(tag)
 			itr.File.Tagged = true
+			tagCount++
+			taggedOutput += strconv.Itoa(tagCount) + ") " + lib.File.Path + " " + lib.File.Version + "\n"
 		}
 
 		if len(itr.File.Version) == 0 {
@@ -176,16 +190,19 @@ func main() {
 		f.StashPop()
 	}
 
-	// Count files updated and prepare status output
-	for fileItr := fileHead; fileItr != nil; fileItr = fileItr.Next {
-		if fileItr.File.Tagged {
-			tagCount++
-			taggedOutput += strconv.Itoa(tagCount) + ") " + fileItr.File.Path + " " + fileItr.File.Version + "\n"
+	if nameOnly {
+		// Print names and quit
+		for fileItr := fileHead; fileItr != nil; fileItr = fileItr.Next {
+			if fileItr.File.Tagged || fileItr.File.Deployed || fileItr.File.Updated || fileItr.File.Installed || action == "list" {
+				fmt.Println(fileItr.File.Path)
+			}
 		}
+
+		return
 	}
 
 	// Separator
-	fmt.Println("")
+	Println("")
 
 	if action == "list" {
 		// If we're just listing files, we don't need to do anything else :)

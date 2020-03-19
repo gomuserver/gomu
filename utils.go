@@ -89,18 +89,27 @@ func exit(status int) {
 	os.Exit(status)
 }
 
-func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.StringArray, debug *bool) {
-	// Get optional args for forcing a tag number and filtering target deps
+func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.StringArray, debug, verbose, nameOnly *bool) {
+	// Get optional args for forcing a tag number, setting branches, and passing actions
 	flag.StringVar(action, "action", "", "function to perform [list|sync|deploy|pull]")
 	flag.StringVar(branch, "branch", "master", "branch to user when pull (and eventually pull request) are used. Default to master (eventually default to current)")
 	flag.StringVar(tag, "tag", "", "optional value to set for git tag")
-	flag.BoolVar(debug, "debug", false, "optional value to get debug output")
+
+	// Filter/Aggregator
 	flag.Var(filterDeps, "dep", "optional dependency filter: accepts multiple -dep flags to only list/sort libs which depend on one of the provided filters")
 	flag.Var(targetDirs, "dir", "optional directory aggregator: accepts multiple -dir flags to aggregate libs in multiple organizations")
+
+	// Output flags
+	flag.BoolVar(debug, "debug", false, "optional value to get debug output")
+	flag.BoolVar(verbose, "verbose", true, "optional value to print progress output")
+	flag.BoolVar(nameOnly, "name-only", false, "optional value to minimize output to just the sorted paths of libs that were changed by gomu. Note, this overrides debug and verbose flags")
+
+	// Load flags
 	flag.Parse()
 
 	// Set output level (TODO: Log level?)
-	common.SetDebug(*debug)
+	common.SetDebug(*debug && !*nameOnly)
+	common.SetVerbose(*verbose && !*nameOnly)
 
 	// Set default return
 	command := *action
