@@ -194,7 +194,7 @@ func main() {
 		// Print names and quit
 		for fileItr := fileHead; fileItr != nil; fileItr = fileItr.Next {
 			if fileItr.File.Tagged || fileItr.File.Deployed || fileItr.File.Updated || fileItr.File.Installed || action == "list" {
-				fmt.Println(fileItr.File.Path)
+				fmt.Println(fileItr.File.GetGoURL())
 			}
 		}
 
