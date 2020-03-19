@@ -48,7 +48,7 @@ func main() {
 
 	// Get all libs within target dirs
 	libs := getLibsInAny(targetDirs)
-	Println("Scanning", len(libs)+1, "file(s) in", targetDirs)
+	Println("\nScanning", len(libs)+1, "file(s) in", targetDirs)
 
 	// Clean working directory
 	var f common.FileWrapper
@@ -62,9 +62,9 @@ func main() {
 	var fileHead *sort.FileNode
 	fileHead, stats.depCount = libs.SortedDependingOnAny(filterDeps)
 	if len(filterDeps) == 0 || len(filterDeps[0]) == 0 {
-		Println("Performing", action, "on", stats.depCount, "lib(s)")
+		Println("\nPerforming", action, "on", stats.depCount, "lib(s)")
 	} else {
-		Println("Performing", action, "on", stats.depCount, "lib(s) depending on", filterDeps)
+		Println("\nPerforming", action, "on", stats.depCount, "lib(s) depending on", filterDeps)
 	}
 
 	switch action {
