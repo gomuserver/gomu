@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -9,6 +10,15 @@ import (
 	sort "github.com/hatchify/mod-sort"
 	sync "github.com/hatchify/mod-sync"
 )
+
+func cleanupStash(libs sort.StringArray) {
+	// Resume working directory
+	var f common.FileWrapper
+	for i := range libs {
+		f.Path = libs[i]
+		f.StashPop()
+	}
+}
 
 func main() {
 	// Flags/Args
@@ -59,7 +69,10 @@ func main() {
 
 	switch action {
 	case "sync", "deploy":
-		showWarningOrQuit("\nIs this ok?")
+		if !showWarning("\nIs this ok?") {
+			cleanupStash(libs)
+			os.Exit(-1)
+		}
 	default:
 		// No worries
 	}
@@ -190,7 +203,7 @@ func main() {
 		}
 	}
 
-	// Resume working directory
+	// Cleanup
 	for i := range libs {
 		f.Path = libs[i]
 		f.CheckoutBranch(branch)
