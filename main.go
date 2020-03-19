@@ -112,17 +112,19 @@ func main() {
 		lib.File = itr.File
 
 		if action == "reset" {
-			lib.File.Output("Checking local changes...")
+			lib.File.Output("Reverting mod files...")
 
-			if lib.File.StashPop() {
-				lib.File.Output("Has local changes - check for conflicts.")
-			}
+			hasChanges := lib.File.StashPop()
 
 			// Revert any changes to mod files
 			lib.File.RunCmd("git", "checkout", "master", "go.mod")
 			lib.File.RunCmd("git", "checkout", "master", "go.sum")
 
 			lib.File.Output("Reverted mod files to master ref.")
+
+			if hasChanges {
+				lib.File.Output("Has local changes - check for conflicts!!!")
+			}
 
 			continue
 		}
