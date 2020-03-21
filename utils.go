@@ -121,7 +121,7 @@ func parseArgs() (options gomu.Options) {
 			case "-log", "-level", "-log-level", "-l":
 				// Single arg
 				curFlag = ""
-				if options.LogLevel != com.NAMEONLY || logLevel == "NAMEONLY" {
+				if options.LogLevel != com.NAMEONLY || logLevel == "-1" {
 					// Ignore log level if name-only is set, unless it was embedded in the bin
 					options.LogLevel = com.LogLevelFrom(*arg)
 				}
