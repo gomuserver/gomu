@@ -38,19 +38,24 @@ func readInput() {
 }
 
 func showHelp() {
-	fmt.Println("\nUsage: gomu <flags> <command: [list|pull|replace-local]> | gomu -action <command: [list|pull|replace-local]> <other flags>")
-	fmt.Println("\nNote: command must be a single token set by action, or trailing optional flags")
+	fmt.Println("\nUsage: gomu <flags> <command: [list|pull|replace-local]> | gomu <command: [list|pull|replace-local]> <other flags>")
+	fmt.Println("\nAction Note: command must be a single token before or after all flags/args")
+	fmt.Println("\nFilter/Target Note: accepts multiple -f/-filter/-dep or -t/-target/-dir arguments")
 	fmt.Println("\nView README.md @ https://github.com/hatchify/gomu")
 	fmt.Println("")
+}
+
+func exitWithError(message string) {
+	showHelp()
+	com.Errorln(message)
+	os.Exit(1)
 }
 
 func parseArgs() (options gomu.Options) {
 	options.LogLevel = com.NORMAL
 
-	fmt.Println("Testing args...")
 	var argV = os.Args
 	var argC = len(argV)
-	fmt.Println(argC, "args:", argV)
 
 	curFlag := ""
 	var arg *string
@@ -60,9 +65,7 @@ func parseArgs() (options gomu.Options) {
 
 		if strings.HasPrefix(*arg, "-") {
 			if !gotTrailing {
-				showHelp()
-				com.Errorln("Error: Unable to parse action.")
-				os.Exit(1)
+				exitWithError("Error: argument expected for flag <" + curFlag + ">")
 			}
 
 			// Parse flags
@@ -71,9 +74,12 @@ func parseArgs() (options gomu.Options) {
 			case "-name-only":
 				// Set value if boolean flag
 				options.LogLevel = com.NAMEONLY
+				gotTrailing = true
 			default:
 				// Set flag if expecting trailing vailues
 				curFlag = *arg
+
+				// Waiting on following args
 				gotTrailing = false
 			}
 		} else {
@@ -88,10 +94,18 @@ func parseArgs() (options gomu.Options) {
 					}
 				}
 			}
+
 			gotTrailing = true
 
 			// Parse args
 			switch curFlag {
+			case "-action", "-a":
+				if options.Action == "" {
+					options.Action = *arg
+				} else if options.Action != *arg {
+					// Action does not match parsed action
+					exitWithError("Error: Unable to parse action <" + *arg + ">, already provided: " + options.Action)
+				}
 			case "-branch", "-b":
 				options.Branch = *arg
 				curFlag = ""
@@ -99,7 +113,7 @@ func parseArgs() (options gomu.Options) {
 			case "-dep", "-depends", "-filter", "-f":
 				options.FilterDependencies = append(options.FilterDependencies, *arg)
 
-			case "-dir", "-directory", "-target", "-d":
+			case "-dir", "-directory", "-target", "-include", "-i":
 				options.TargetDirectories = append(options.TargetDirectories, *arg)
 
 			case "-log", "-level", "-log-level", "-l":
@@ -131,15 +145,13 @@ func parseArgs() (options gomu.Options) {
 
 	if len(options.Action) == 0 {
 		// Error parsing
-		showHelp()
-		com.Errorln("Error: Unable to parse action.")
-		os.Exit(1)
+		exitWithError("Error: Unable to parse action. No action provided.")
 	}
 
 	return
 }
 
-func checkArgs() *gomu.MU {
+func gomuFromArgs() *gomu.MU {
 	options := parseArgs()
 	common.SetLogLevel(options.LogLevel)
 

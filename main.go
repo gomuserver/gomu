@@ -1,15 +1,13 @@
 package main
 
 import (
-	"fmt"
-
 	com "github.com/hatchify/mod-common"
 	gomu "github.com/hatchify/mod-utils"
 )
 
 func main() {
 	// Parse command line values, check supported functions, set defaults
-	mu := checkArgs()
+	mu := gomuFromArgs()
 
 	switch mu.Options.Action {
 	case "deploy", "sync":
@@ -17,7 +15,6 @@ func main() {
 		gomu.CleanModCache()
 	}
 
-	fmt.Println("Options:", mu.Options)
 	gomu.RunThen(mu, printOutput)
 }
 
