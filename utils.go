@@ -95,16 +95,23 @@ func parseArgs() (options gomu.Options) {
 			case "-branch", "-b":
 				options.Branch = *arg
 				curFlag = ""
+
 			case "-dep", "-depends", "-filter", "-f":
 				options.FilterDependencies = append(options.FilterDependencies, *arg)
-			case "-dir", "-directory", "-target", "-t":
+
+			case "-dir", "-directory", "-target", "-d":
 				options.TargetDirectories = append(options.TargetDirectories, *arg)
+
 			case "-log", "-level", "-log-level", "-l":
 				if options.LogLevel != com.NAMEONLY {
 					// Ignore log level if name-only is set
 					options.LogLevel = com.LogLevelFrom(*arg)
 				}
 				curFlag = ""
+
+			case "-tag", "-t":
+				options.Tag = *arg
+
 			case "":
 				if len(options.Action) == 0 {
 					// Comand
