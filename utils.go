@@ -12,6 +12,7 @@ import (
 )
 
 var version = "undefined"
+var logLevel = "NORMAL"
 
 func readInput() {
 	var (
@@ -52,7 +53,7 @@ func exitWithError(message string) {
 }
 
 func parseArgs() (options gomu.Options) {
-	options.LogLevel = com.NORMAL
+	options.LogLevel = com.LogLevelFrom(logLevel)
 
 	var argV = os.Args
 	var argC = len(argV)
@@ -107,8 +108,9 @@ func parseArgs() (options gomu.Options) {
 					exitWithError("Error: Unable to parse action <" + *arg + ">, already provided: " + options.Action)
 				}
 			case "-branch", "-b":
-				options.Branch = *arg
+				// Single arg
 				curFlag = ""
+				options.Branch = *arg
 
 			case "-dep", "-depends", "-filter", "-f":
 				options.FilterDependencies = append(options.FilterDependencies, *arg)
@@ -117,18 +119,21 @@ func parseArgs() (options gomu.Options) {
 				options.TargetDirectories = append(options.TargetDirectories, *arg)
 
 			case "-log", "-level", "-log-level", "-l":
-				if options.LogLevel != com.NAMEONLY {
-					// Ignore log level if name-only is set
+				// Single arg
+				curFlag = ""
+				if options.LogLevel != com.NAMEONLY || logLevel == "NAMEONLY" {
+					// Ignore log level if name-only is set, unless it was embedded in the bin
 					options.LogLevel = com.LogLevelFrom(*arg)
 				}
-				curFlag = ""
 
 			case "-tag", "-t":
+				// Single arg
+				curFlag = ""
 				options.Tag = *arg
 
 			case "":
 				if len(options.Action) == 0 {
-					// Comand
+					// Command
 					options.Action = *arg
 				} else {
 					// Arg

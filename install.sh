@@ -16,7 +16,7 @@ if [[ $tag == $version ]]; then
 fi
 
 echo "Installing gomu $tag..."
-go install -i -v -ldflags="-X main.version=$tag" -trimpath || quit "Failed to build gomu :("
+go install -i -v -ldflags="-X main.version=$tag -X main.logLevel=-1" -trimpath || quit "Failed to build gomu :("
 
 which gomu > /dev/null && version=$(gomu version)
 if [[ $tag == $version ]]; then
