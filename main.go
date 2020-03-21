@@ -24,9 +24,11 @@ func main() {
 func printOutput(mu *gomu.MU) {
 	if len(mu.Errors) > 0 {
 		com.Println(mu.Stats.Format(mu.Options.Action, mu.Options.Branch))
-		com.Println("Quitting with errors:", mu.Errors)
+		com.Println("Quitting with errors:\n", mu.Errors)
 	} else {
 		com.Println("All clean!")
 		com.Println(mu.Stats.Format(mu.Options.Action, mu.Options.Branch))
 	}
+
+	com.Println("")
 }
