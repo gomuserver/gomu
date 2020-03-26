@@ -6,5 +6,5 @@ github.com/hatchify/mod-common v0.4.91 h1:qt6vs2EZ8v/1eCXZyMYanrQKkvQBGG1q+XzDiV
 github.com/hatchify/mod-common v0.4.91/go.mod h1:L88k+TAPMkjazqJnVtgJZe66q5/XUIlvxrw8kpJwjMc=
 github.com/hatchify/mod-sort v0.4.94 h1:NyCEGLF0PvUj0ySFdRuXEKreD8v+3R3PB3N/KG1wPPM=
 github.com/hatchify/mod-sort v0.4.94/go.mod h1:0HACzr2b+JKawv41q58GHuCvxInE3Y58rKRlMR/DOyo=
-github.com/hatchify/mod-utils v0.1.13 h1:6fEJVKtmqyZuT5igUMDy5WQ0zQk1oM/QiBjpS2ZMJ14=
-github.com/hatchify/mod-utils v0.1.13/go.mod h1:nY45/EQuOcuZL0IZJMAYSJaXk37o4Pbg7dh1IoVuIzw=
+github.com/hatchify/mod-utils v0.1.14 h1:7Pj1umYVok5MlD3TPTlmk70tMPLb7dJka5UkzzPV3SU=
+github.com/hatchify/mod-utils v0.1.14/go.mod h1:nY45/EQuOcuZL0IZJMAYSJaXk37o4Pbg7dh1IoVuIzw=
