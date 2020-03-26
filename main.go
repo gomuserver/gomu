@@ -12,7 +12,7 @@ func main() {
 	switch mu.Options.Action {
 	case "deploy", "sync":
 		// Clear mod cache before updating mod files
-		gomu.CleanModCache()
+		//gomu.CleanModCache()
 	}
 
 	gomu.RunThen(mu, printOutput)
