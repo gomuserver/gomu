@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/hatchify/mod-common v0.4.91
-	github.com/hatchify/mod-utils v0.1.14
+	github.com/hatchify/mod-utils v0.1.15
 )
 
 // *** Separate Local Deps *** \\
