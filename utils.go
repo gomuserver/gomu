@@ -9,6 +9,7 @@ import (
 	com "github.com/hatchify/mod-common"
 	common "github.com/hatchify/mod-common"
 	gomu "github.com/hatchify/mod-utils"
+	flag "github.com/hatchify/parg"
 )
 
 var version = "undefined"
@@ -52,112 +53,116 @@ func exitWithError(message string) {
 	os.Exit(1)
 }
 
-func parseArgs() (options gomu.Options) {
-	options.LogLevel = com.LogLevelFrom(logLevel)
+// Parg will parse your args
+func getCommand() (cmd *flag.Command, err error) {
+	// Command/Arg/Flag parser
+	parg := flag.New()
 
-	var argV = os.Args
-	var argC = len(argV)
+	// Configure commands
+	parg.AddAction("")        // Prints help
+	parg.AddAction("help")    // Prints help
+	parg.AddAction("version") // Prints version (if available)
 
-	curFlag := ""
-	var arg *string
-	var gotTrailing = true
-	for i := 1; i < argC; i++ {
-		arg = &argV[i]
+	parg.AddAction("list") // Prints each file in chain
+	parg.AddAction("pull") // Pulls latest changes for each file in chain
 
-		if strings.HasPrefix(*arg, "-") {
-			if !gotTrailing {
-				exitWithError("Error: argument expected for flag <" + curFlag + ">")
-			}
+	parg.AddAction("replace") // Replaces local for each dep in chain
+	parg.AddAction("reset")   // Resets mod files for each dep in chain
 
-			// Parse flags
-			curFlag = ""
-			switch *arg {
-			case "-name-only":
-				// Set value if boolean flag
-				options.LogLevel = com.NAMEONLY
-				gotTrailing = true
-			default:
-				// Set flag if expecting trailing vailues
-				curFlag = *arg
+	parg.AddAction("sync") // Updates mod files for each dep in chain
 
-				// Waiting on following args
-				gotTrailing = false
-			}
-		} else {
-			if i == argC-1 {
-				// End of args
-				if gotTrailing {
-					// Satisfied previous arg
-					if len(options.Action) == 0 {
-						// We need an action.. this one should do?
-						options.Action = *arg
-						break
-					}
-				}
-			}
+	// Configure flags
+	parg.AddGlobalFlag(flag.Flag{ // Directories to search in
+		Name:        "-include",
+		Identifiers: []string{"-i", "-in", "-include"},
+		Type:        flag.STRINGS,
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Branch to checkout/create
+		Name:        "-branch",
+		Identifiers: []string{"-b", "-branch"},
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Branch to checkout/create
+		Name:        "-message",
+		Identifiers: []string{"-m", "-msg", "-message"},
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Minimal output for | chains
+		Name:        "-name-only",
+		Identifiers: []string{"-name", "-name-only"},
+		Type:        flag.BOOL,
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Commits local changes
+		Name:        "-commit",
+		Identifiers: []string{"-c", "-commit"},
+		Type:        flag.BOOL,
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Creates pull request if possible
+		Name:        "-pull-request",
+		Identifiers: []string{"-pr", "-pull-request"},
+		Type:        flag.BOOL,
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Update tag/version for changed libs or subdeps
+		Name:        "-tag",
+		Identifiers: []string{"-t", "-tag"},
+		Type:        flag.BOOL,
+	})
 
-			gotTrailing = true
+	return flag.Validate()
+}
 
-			// Parse args
-			switch curFlag {
-			case "-action", "-a":
-				if options.Action == "" {
-					options.Action = *arg
-				} else if options.Action != *arg {
-					// Action does not match parsed action
-					exitWithError("Error: Unable to parse action <" + *arg + ">, already provided: " + options.Action)
-				}
-			case "-branch", "-b":
-				// Single arg
-				curFlag = ""
-				options.Branch = *arg
-
-			case "-dep", "-depends", "-filter", "-f":
-				options.FilterDependencies = append(options.FilterDependencies, *arg)
-
-			case "-dir", "-directory", "-target", "-include", "-i":
-				options.TargetDirectories = append(options.TargetDirectories, *arg)
-
-			case "-log", "-level", "-log-level", "-l":
-				// Single arg
-				curFlag = ""
-				if options.LogLevel != com.NAMEONLY || logLevel == "-1" {
-					// Ignore log level if name-only is set, unless it was embedded in the bin
-					options.LogLevel = com.LogLevelFrom(*arg)
-				}
-
-			case "-tag", "-t":
-				// Single arg
-				curFlag = ""
-				options.Tag = *arg
-
-			case "":
-				if len(options.Action) == 0 {
-					// Command
-					options.Action = *arg
-				} else {
-					// Arg
-					options.Args = append(options.Args, *arg)
-				}
-			}
-		}
+func gomuOptions() (options gomu.Options) {
+	// Get command from args
+	cmd, err := getCommand()
+	if err != nil {
+		// Show usage and exit with error
+		showHelp()
+		com.Errorln("\nError parsing arguments: ", err)
+		os.Exit(1)
+	}
+	if cmd == nil {
+		showHelp()
+		com.Errorln("\nError parsing command: ", err)
+		os.Exit(1)
 	}
 
-	if len(options.TargetDirectories) == 0 {
-		options.TargetDirectories = []string{"."}
+	switch cmd.Action {
+	case "version":
+		// Print version and exit without error
+		fmt.Println(version)
+		os.Exit(0)
+	case "help", "", " ":
+		// Print help and exit without error
+		showHelp()
+		os.Exit(0)
 	}
-	options.Action = strings.ToLower(options.Action)
 
-	if len(options.Action) == 0 {
-		// Error parsing
-		exitWithError("Error: Unable to parse action. No action provided.")
+	// Parse options from cmd
+	options.Action = cmd.Action
+
+	// Args
+	options.FilterDependencies = make([]string, len(cmd.Arguments))
+	for i, argument := range cmd.Arguments {
+		options.FilterDependencies[i] = argument.Name
+	}
+
+	// Flags
+	options.TargetDirectories = cmd.StringsFrom("-include")
+
+	options.Branch = cmd.StringFrom("-branch")
+	options.CommitMessage = cmd.StringFrom("-message")
+
+	options.Commit = cmd.BoolFrom("-commit")
+	options.PullRequest = cmd.BoolFrom("-pull-request")
+	options.Tag = cmd.BoolFrom("-tag")
+	nameOnly := cmd.BoolFrom("-name-only")
+	if nameOnly {
+		options.LogLevel = com.NAMEONLY
 	}
 
 	return
 }
 
-func gomuFromArgs() *gomu.MU {
-	options := parseArgs()
+func fromArgs() *gomu.MU {
+	options := gomuOptions()
 	common.SetLogLevel(options.LogLevel)
 
 	// TODO: Validate args/flags?

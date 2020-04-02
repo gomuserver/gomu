@@ -7,24 +7,18 @@ import (
 
 func main() {
 	// Parse command line values, check supported functions, set defaults
-	mu := gomuFromArgs()
-
-	switch mu.Options.Action {
-	case "deploy", "sync":
-		// Clear mod cache before updating mod files
-		//gomu.CleanModCache()
-	}
+	mu := fromArgs()
 
 	gomu.RunThen(mu, printOutput)
 }
 
 func printOutput(mu *gomu.MU) {
 	if len(mu.Errors) > 0 {
-		com.Println(mu.Stats.Format(mu.Options.Action, mu.Options.Branch))
+		com.Println(mu.Stats.Format())
 		com.Println("Quitting with errors:\n", mu.Errors)
 		com.Println("")
 	} else {
-		com.Println("All clean!\n")
-		com.Println(mu.Stats.Format(mu.Options.Action, mu.Options.Branch))
+		com.Println("All clean!\n ")
+		com.Println(mu.Stats.Format())
 	}
 }
