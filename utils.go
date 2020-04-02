@@ -156,6 +156,8 @@ func gomuOptions() (options gomu.Options) {
 	nameOnly := cmd.BoolFrom("-name-only")
 	if nameOnly {
 		options.LogLevel = com.NAMEONLY
+	} else {
+		options.LogLevel = com.NORMAL
 	}
 
 	return
@@ -165,29 +167,8 @@ func fromArgs() *gomu.MU {
 	options := gomuOptions()
 	common.SetLogLevel(options.LogLevel)
 
-	// TODO: Validate args/flags?
-
-	// Check for supported actions
-	switch options.Action {
-	case "list", "pull", "reset", "replace-local":
-		// Public commands
-
-	case "sync", "deploy":
-		// Supported actions. Fall through
-
-	case "version":
-		// Print version and exit without error
-		fmt.Println(version)
-		os.Exit(0)
-	case "help":
-		// Print help and exit without error
-		showHelp()
-		os.Exit(0)
-	default:
-		// Show usage and exit with error
-		com.Errorln("\nError: Unsupported action: <" + options.Action + ">")
-		showHelp()
-		os.Exit(1)
+	if len(options.TargetDirectories) == 0 {
+		options.TargetDirectories = []string{"."}
 	}
 
 	return gomu.New(options)
