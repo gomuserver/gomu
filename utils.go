@@ -59,17 +59,17 @@ func getCommand() (cmd *flag.Command, err error) {
 	parg := flag.New()
 
 	// Configure commands
-	parg.AddAction("")        // Prints help
-	parg.AddAction("help")    // Prints help
-	parg.AddAction("version") // Prints version (if available)
+	parg.AddAction("", "")        // Prints Usage
+	parg.AddAction("help", "")    // Prints help
+	parg.AddAction("version", "") // Prints version (if available)
 
-	parg.AddAction("list") // Prints each file in chain
-	parg.AddAction("pull") // Pulls latest changes for each file in chain
+	parg.AddAction("list", "") // Prints each file in chain
+	parg.AddAction("pull", "") // Pulls latest changes for each file in chain
 
-	parg.AddAction("replace") // Replaces local for each dep in chain
-	parg.AddAction("reset")   // Resets mod files for each dep in chain
+	parg.AddAction("replace", "") // Replaces local for each dep in chain
+	parg.AddAction("reset", "")   // Resets mod files for each dep in chain
 
-	parg.AddAction("sync") // Updates mod files for each dep in chain
+	parg.AddAction("sync", "") // Updates mod files for each dep in chain
 
 	// Configure flags
 	parg.AddGlobalFlag(flag.Flag{ // Directories to search in
@@ -112,6 +112,9 @@ func getCommand() (cmd *flag.Command, err error) {
 func gomuOptions() (options gomu.Options) {
 	// Get command from args
 	cmd, err := getCommand()
+
+	// TODO: cmd.Help() && parg.Help()
+
 	if err != nil {
 		// Show usage and exit with error
 		showHelp()
