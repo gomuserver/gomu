@@ -6,8 +6,8 @@ github.com/hatchify/mod-common v0.4.101 h1:X5HR0b+dmLqZq0ce6oTHE2Drp2kyQ2oyjE2AX
 github.com/hatchify/mod-common v0.4.101/go.mod h1:2FN3hgxxHLDz+hy3adP+PyyrdUYX1iSXsh5AccQuvIY=
 github.com/hatchify/mod-sort v0.4.101 h1:BrokmvInhRaEfi9eigAPAKyQP+Am9ZopPSC/YTM5+Pk=
 github.com/hatchify/mod-sort v0.4.101/go.mod h1:FYh8QWtU5XVoU1hBWrRsBcKJkRJDfoQjdZxH5G0PCJ0=
-github.com/hatchify/mod-utils v0.4.101 h1:8PKHBQHZvIn2z577oEUlTvJBL137YKG6isTongqn2TA=
-github.com/hatchify/mod-utils v0.4.101/go.mod h1:dhDBpukwNBvXHn8kCqwv08U46+P6DcS2ukyYXeXh/gM=
+github.com/hatchify/mod-utils v0.4.103 h1:ctMaD/eVVLjjwLG19alT+YUtO67M0WnytVcurQa9Gj4=
+github.com/hatchify/mod-utils v0.4.103/go.mod h1:dhDBpukwNBvXHn8kCqwv08U46+P6DcS2ukyYXeXh/gM=
 github.com/hatchify/parg v0.1.13 h1:8IO98RrWVwrHt7mNqy9x42nMsoF9J/E3fT1XaJkVSMg=
 github.com/hatchify/parg v0.1.13/go.mod h1:JS52bGPjkpjCvRvWrrBR/c5mYufgJgTMr8cG6xR4YtQ=
 github.com/hatchify/simply v0.0.15 h1:k7FB9dOMZ0d1pV/nRyAtaXRAAB5udYbJH9Iq2rSTwwQ=
