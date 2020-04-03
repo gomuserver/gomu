@@ -58,7 +58,7 @@ func getCommand() (cmd *flag.Command, err error) {
 	parg := flag.New()
 
 	// Configure commands
-	parg.AddAction("", "Note - Will accept multiple arguments\n  Aggregate libs to crawl the dependency chain.\n  Providing no arguments will act on files in selected directories\n  (Be Careful!)\n\n  Usage: `gomu <optional flags> cmd args <optional flags>`")
+	parg.AddAction("", "Designed to make working with mod files easier.\n  To learn more, run `gomu help` or `gomu help <command>`\n  (Flags can be added to either help command)")
 	parg.AddAction("help", "Prints available commands and flags.\n  Use `gomu help <command> <flags>` to get more specific info")
 	parg.AddAction("version", "Prints current version. Use ./install.sh to get version support")
 
@@ -111,6 +111,11 @@ func getCommand() (cmd *flag.Command, err error) {
 		Type:        flag.BOOL,
 		Help:        "Will increment tag if new commits since last tag\n  Requires tag previously set\n  Usage: `gomu sync -t`",
 	})
+	parg.AddGlobalFlag(flag.Flag{ // Update tag/version for changed libs or subdeps
+		Name:        "-set-version",
+		Identifiers: []string{"-set", "-set-version"},
+		Help:        "Can be used with -tag to update semver\n  Will force tag version for all deps in chain\n  Usage: `gomu sync -t -set v0.5.0`",
+	})
 
 	return flag.Validate()
 }
@@ -124,12 +129,12 @@ func gomuOptions() (options gomu.Options) {
 	if err != nil {
 		// Show usage and exit with error
 		showHelp(nil)
-		com.Errorln("\nError parsing arguments: ", err)
+		com.Errorln("Error parsing arguments: ", err)
 		os.Exit(1)
 	}
 	if cmd == nil {
 		showHelp(cmd)
-		com.Errorln("\nError parsing command: ", err)
+		com.Errorln("Error parsing command: ", err)
 		os.Exit(1)
 	}
 
@@ -138,7 +143,7 @@ func gomuOptions() (options gomu.Options) {
 		// Print version and exit without error
 		fmt.Println(version)
 		os.Exit(0)
-	case "help", "", " ":
+	case "help", "":
 		// Print help and exit without error
 		showHelp(cmd)
 		os.Exit(0)
@@ -162,6 +167,8 @@ func gomuOptions() (options gomu.Options) {
 	options.Commit = cmd.BoolFrom("-commit")
 	options.PullRequest = cmd.BoolFrom("-pull-request")
 	options.Tag = cmd.BoolFrom("-tag")
+	options.SetVersion = cmd.StringFrom("-set-version")
+
 	nameOnly := cmd.BoolFrom("-name-only")
 	if nameOnly {
 		options.LogLevel = com.NAMEONLY
