@@ -1,61 +1,106 @@
-#gomu - Go Mod Utils
-gomu is intended to make working with go.mod sane.
+# gomu - Go Mod Utils #
+Designed to make working with mod files easier.
 
-## Non Destructive ##
-Non Destructive commands will not commit/push changes to the repository. However, they should not be interrupted.
+# Commands #
+Commands are actions taken on the dependency chain.
 
-# list: Sorted dependencies
-List all dependencies in order of the dependency chain
-`gomu list`
+This is usually parsed as the first non-flag argument passed to the utility.
 
-# pull: Update all libs
-Pull all dependencies in order of the dependency chain
-`gomu pull`
+## Help Commands ##
+Help commands will print usage instructions and details.
 
-# replace-local: Add local replacement
-Appends a local replacement clause to each lib's go.mod file, directing each dependency preceding lib in the chain to a local source
-`gomu replace-local`
+Running help commands with arguments and flags provides more specific contextual details.
 
-# help: Show usage
-Show flags/args and usage help
-`gomu help`
+### gomu ###
+  :: Designed to make working with mod files easier.
+  To learn more, run `gomu help` or `gomu help <command>`
+  (Flags can be added to either help command)
 
-## Destrucive ##
-Destructive commands can/will attempt to commit and push changes. If running with -name-only, it will NOT prompt you for a warning. Please be careful!
+### gomu help ###
+  :: Prints available commands and flags.
+  Use `gomu help <command> <flags>` to get more specific info.
 
-# sync: Update deps and tags for sorted dependencies in order
-Update mod files up the chain, tagging new and pushing versions where applicable, cleaning go.sum
-`gomu sync`
+### gomu version ###
+  :: Prints current version. Use ./install.sh to get version support.
 
-# deploy: Push local changes, then sync
-Performs sync with the added functionality of committing/pushing local changes to a provided branch
-`gomu deploy`
+## Local Commands ##
+Local commands can/will make stashes and edits to local files on your working copies.
 
-#Options
-Flags and args
+However, they will not attempt to commit or push any changes by themselves.
 
-# -dir: Search within Target dir (accepts multiple -dir flags)
--dir will aggregate all files within provided directories. Omitting entirely will run from the current directory
-`gomu -dir <your-organization> sync`
+### gomu list ###
+  :: Prints each file in dependency chain.
 
-# -dep: Filter libs depending on dep (accepts multiple -dep flags)
--dep will ignore any libs wich do not the provided dep suffix in the go.sum file
-`gomu -dep vroomy/plugins sync`
+### gomu pull ###
+  :: Updates branch for file in dependency chain.
+  Providing a -branch will checkout given branch.
+  Creates branch if provided none exists.
 
-# -action: Interchangable with trailing command arg
--action is simply for convenience allowing training -flags instead of requiring the ending arg to be the command
-`gomu -action replace-local`
+### gomu replace ###
+  :: Replaces each versioned file in the dependency chain.
+  Uses the current checked out local copy.
 
-# -name-only: Minimize output to goUrl of updated files only
--name-only is typically used for | command chains or simply less verbosity
-`gomu -action list -name-only -dir hatchify -dir vroomy -dir <your-organization> -dep errors`
+### gomu reset ###
+  :: Reverts go.mod and go.sum back to last committed version.
+  Usage: `gomu reset mod-common parg`
 
-# -tag: Set Version tag
--tag will force set a specific tag upon sync or deploy. Omitting will attempt to increment tag if a vx.x.x tag is currently set for the lib
 
-NOTE: go.mod seems to have trouble with versions greater than v1.0.0 - this is not tested or officially supported as of this version of gomu
-`gomu -action sync -tag v0.1.0`
+## Destrucive Commands ##
+Destructive commands can/will attempt to commit and push changes.
 
-# -branch: Checkout branch 
--branch will checkout/create a provided branch before making any changes (and eventually manage pull requests)
-`gomu -action pull -branch develop`
+If running with -name-only, it will NOT prompt you for a warning.
+
+Please be careful!
+
+### gomu sync ###
+  :: Updates modfiles
+  Conditionally performs extra tasks depending on flags.
+  Usage: `gomu <flags> sync mod-common parg simply <flags>`
+
+# Flags #
+Flags are options that can be set for some commands. 
+
+Flags can be added before or after command name.
+
+However, it is best not to split up flags and commands/args to avoid any accidental commands.
+
+### [-i -in -include] ###
+  :: Will aggregate files in 1 or more directories.
+  Usage: `gomu list -i hatchify -i vroomy`
+
+### [-b -branch] ###
+  :: Will checkout or create said branch
+  Updating or creating a pull request.
+  Depending on command and other flags.
+  Usage: `gomu pull -b feature/Jira-Ticket`
+
+### [-name -name-only] ###
+  :: Will reduce output to just the filenames changed.
+  (ls-styled output for | chaining)
+  Usage: `gomu list -name`
+
+### [-c -commit] ###
+  :: Will commit local changes if present.
+  Includes all changed files in repository.
+  Usage: `gomu sync -c`
+
+### [-pr -pull-request] ###
+  :: Will create a pull request if possible.
+  Fails if on master, or if no changes.
+  Usage: `gomu sync -pr`
+
+### [-m -msg -message] ###
+  :: Will set a custom commit message.
+  Applies to -c and -pr flags.
+  Usage: `gomu sync -c -m "Update all the things!"`
+
+### [-t -tag] ###
+  :: Will increment tag if new commits since last tag.
+  Requires tag previously set.
+  Usage: `gomu sync -t`
+
+### [-set -set-version] ###
+  :: Can be used with -tag to update semver.
+  Will force tag version for all deps in chain.
+  Usage: `gomu sync -t -set v0.5.0`
+

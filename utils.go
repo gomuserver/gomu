@@ -2,72 +2,18 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"os"
-	"os/exec"
-	"path"
 	"strings"
 
+	com "github.com/hatchify/mod-common"
 	common "github.com/hatchify/mod-common"
-	sorter "github.com/hatchify/mod-sort"
+	gomu "github.com/hatchify/mod-utils"
+	flag "github.com/hatchify/parg"
 )
 
 var version = "undefined"
-var nameOnly bool
-
-// Println will print line if nameOnly isn't set
-func Println(a ...interface{}) (n int, err error) {
-	if !nameOnly {
-		n, err = fmt.Println(a...)
-	}
-
-	return
-}
-
-// Parses arguments to load target directories
-// Returns current lib if no args provided
-func getTargetDirs() (targetLibs sorter.StringArray) {
-	targetLibs = flag.Args()
-	if len(targetLibs) == 0 {
-		targetLibs = append(targetLibs, ".")
-	}
-	return
-}
-
-// Aggregates all libs within all target dirs
-func getLibsInAny(targetDirs []string) (libs sorter.StringArray) {
-	libs = make(sorter.StringArray, 0)
-	for index := range targetDirs {
-		libs = append(libs, getLibsInDirectory(targetDirs[index])...)
-	}
-
-	return
-}
-
-// Gets all libs in a given directory
-func getLibsInDirectory(dir string) (libs sorter.StringArray) {
-	cmd := exec.Command("ls")
-	cmd.Dir = dir
-	stdout, err := cmd.Output()
-
-	if err != nil {
-		return
-	}
-
-	// Parse files from exec "ls"
-	libs = strings.Split(string(stdout), "\n")
-	for index := range libs {
-		switch libs[index] {
-		case ".", "..", dir:
-			// Ignore non-repositories
-		default:
-			libs[index] = path.Join(dir, libs[index])
-		}
-	}
-
-	return
-}
+var logLevel = "NORMAL"
 
 func readInput() {
 	var (
@@ -93,143 +39,153 @@ func readInput() {
 	}
 }
 
-func showHelp() {
-	fmt.Println("\nUsage: gomu <flags> <command: [list|pull|replace-local]> | gomu -action <command: [list|pull|replace-local]> <other flags>")
-	fmt.Println("\nNote: command must be a single token set by action, or trailing optional flags")
-	fmt.Println("\nView README.md @ https://github.com/hatchify/gomu")
-	fmt.Println("")
-}
-
-func exit(status int) {
-	showHelp()
-	os.Exit(status)
-}
-
-func showWarningOrQuit(message string) {
-	if !showWarning(message) {
-		Println("Exiting...")
-		exit(0)
+func showHelp(cmd *flag.Command) {
+	if cmd == nil {
+		fmt.Println(flag.Help())
+	} else {
+		fmt.Println(cmd.ShowHelp())
 	}
 }
 
-func showWarning(message string) (ok bool) {
-	if nameOnly {
-		// Don't show warnings for name only
-		return true
-	}
-
-	var err error
-	var text string
-	reader := bufio.NewReader(os.Stdin)
-
-	for err == nil {
-		if text = strings.TrimSpace(text); len(text) > 0 {
-			switch text {
-			case "y", "Y", "Yes", "yes", "YES", "ok", "OK", "Ok":
-				ok = true
-				return
-			default:
-				Println("Nevermind then! :)")
-				return
-			}
-		}
-
-		// No newline. name-only already exited above
-		fmt.Print(message + " [y|yes|ok]: ")
-		text, err = reader.ReadString('\n')
-	}
-
-	Println("Oops... Something went wrong.")
-	return
+func exitWithError(message string) {
+	com.Errorln(message)
+	os.Exit(1)
 }
 
-func checkArgs(action, branch, tag *string, filterDeps, targetDirs *sorter.StringArray, debug, verbose, nameOnly *bool) {
-	// Get optional args for forcing a tag number, setting branches, and passing actions
-	flag.StringVar(action, "action", "", "function to perform [list|sync|deploy|pull]")
-	flag.StringVar(branch, "branch", "master", "branch to user when pull (and eventually pull request) are used. Default to master (eventually default to current)")
-	flag.StringVar(tag, "tag", "", "optional value to set for git tag")
+// Parg will parse your args
+func getCommand() (cmd *flag.Command, err error) {
+	// Command/Arg/Flag parser
+	parg := flag.New()
 
-	// Filter/Aggregator
-	flag.Var(filterDeps, "dep", "optional dependency filter: accepts multiple -dep flags to only list/sort libs which depend on one of the provided filters")
-	flag.Var(targetDirs, "dir", "optional directory aggregator: accepts multiple -dir flags to aggregate libs in multiple organizations")
+	// Configure commands
+	parg.AddAction("", "Designed to make working with mod files easier.\n  To learn more, run `gomu help` or `gomu help <command>`\n  (Flags can be added to either help command)")
+	parg.AddAction("help", "Prints available commands and flags.\n  Use `gomu help <command> <flags>` to get more specific info.")
+	parg.AddAction("version", "Prints current version. Use ./install.sh to get version support.")
 
-	// Output flags
-	flag.BoolVar(debug, "debug", false, "optional value to get debug output")
-	flag.BoolVar(verbose, "verbose", true, "optional value to print progress output")
-	flag.BoolVar(nameOnly, "name-only", false, "optional value to minimize output to just the sorted paths of libs that were changed by gomu. Note, this overrides debug and verbose flags")
+	parg.AddAction("list", "Prints each file in dependency chain.")
+	parg.AddAction("pull", "Updates branch for file in dependency chain.\n  Providing a -branch will checkout given branch.\n  Creates branch if provided none exists.")
 
-	// Load flags
-	flag.Parse()
+	parg.AddAction("replace", "Replaces each versioned file in the dependency chain.\n  Uses the current checked out local copy.")
+	parg.AddAction("reset", "Reverts go.mod and go.sum back to last committed version.\n  Usage: `gomu reset mod-common parg`")
 
-	// Set output level (TODO: Log level?)
-	common.SetDebug(*debug && !*nameOnly)
-	common.SetVerbose(*verbose && !*nameOnly)
+	parg.AddAction("sync", "Updates modfiles\n  Conditionally performs extra tasks depending on flags.\n  Usage: `gomu <flags> sync mod-common parg simply <flags>`")
 
-	// Set default return
-	command := *action
+	// Configure flags
+	parg.AddGlobalFlag(flag.Flag{ // Directories to search in
+		Name:        "-include",
+		Identifiers: []string{"-i", "-in", "-include"},
+		Type:        flag.STRINGS,
+		Help:        "Will aggregate files in 1 or more directories.\n  Usage: `gomu list -i hatchify -i vroomy`",
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Branch to checkout/create
+		Name:        "-branch",
+		Identifiers: []string{"-b", "-branch"},
+		Help:        "Will checkout or create said branch.\n  Updating or creating a pull request.\n  Depending on command and other flags.\n  Usage: `gomu pull -b feature/Jira-Ticket`",
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Minimal output for | chains
+		Name:        "-name-only",
+		Identifiers: []string{"-name", "-name-only"},
+		Type:        flag.BOOL,
+		Help:        "Will reduce output to just the filenames changed.\n  (ls-styled output for | chaining)\n  Usage: `gomu list -name`",
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Commits local changes
+		Name:        "-commit",
+		Identifiers: []string{"-c", "-commit"},
+		Type:        flag.BOOL,
+		Help:        "Will commit local changes if present.\n  Includes all changed files in repository.\n  Usage: `gomu sync -c`",
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Creates pull request if possible
+		Name:        "-pull-request",
+		Identifiers: []string{"-pr", "-pull-request"},
+		Type:        flag.BOOL,
+		Help:        "Will create a pull request if possible.\n  Fails if on master, or if no changes.\n  Usage: `gomu sync -pr`",
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Branch to checkout/create
+		Name:        "-message",
+		Identifiers: []string{"-m", "-msg", "-message"},
+		Help:        "Will set a custom commit message.\n  Applies to -c and -pr flags.\n  Usage: `gomu sync -c -m \"Update all the things!\"`",
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Update tag/version for changed libs or subdeps
+		Name:        "-tag",
+		Identifiers: []string{"-t", "-tag"},
+		Type:        flag.BOOL,
+		Help:        "Will increment tag if new commits since last tag.\n  Requires tag previously set.\n  Usage: `gomu sync -t`",
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Update tag/version for changed libs or subdeps
+		Name:        "-set-version",
+		Identifiers: []string{"-set", "-set-version"},
+		Help:        "Can be used with -tag to update sem-ver.\n  Will force tag version for all deps in chain.\n  Usage: `gomu sync -t -set v0.5.0`",
+	})
 
-	// Check for conflict in action vs args to parse command
-	if len(flag.Args()) == 1 {
-		if len(command) != 0 {
-			if command != flag.Arg(0) {
-				// Conflict?
-				fmt.Println("\nError: Unable to parse action: <" + command + "> from command: <" + flag.Arg(0) + ">")
-				exit(1)
-			}
-		} else {
-			command = flag.Arg(0)
-		}
+	return flag.Validate()
+}
+
+func gomuOptions() (options gomu.Options) {
+	// Get command from args
+	cmd, err := getCommand()
+
+	// TODO: cmd.Help() && parg.Help()
+
+	if err != nil {
+		// Show usage and exit with error
+		showHelp(nil)
+		com.Errorln("Error parsing arguments: ", err)
+		os.Exit(1)
+	}
+	if cmd == nil {
+		showHelp(cmd)
+		com.Errorln("Error parsing command: ", err)
+		os.Exit(1)
 	}
 
-	// Check for supported actions
-	command = strings.ToLower(command)
-	switch command {
-	case "list", "pull", "reset", "replace-local":
-		// Public commands
-
-	case "sync", "deploy":
-		// Supported actions. Fall through
-
+	switch cmd.Action {
 	case "version":
 		// Print version and exit without error
 		fmt.Println(version)
 		os.Exit(0)
-	case "help":
+	case "help", "":
 		// Print help and exit without error
-		exit(0)
-	default:
-		// Show usage and exit with error
-		fmt.Println("\nError: Unsupported action: <" + command + ">")
-		exit(1)
+		showHelp(cmd)
+		os.Exit(0)
 	}
 
-	// Set defaults if necessary
-	if len(*targetDirs) == 0 {
-		*targetDirs = append(*targetDirs, ".")
+	// Parse options from cmd
+	options.Action = cmd.Action
+
+	// Args
+	options.FilterDependencies = make([]string, len(cmd.Arguments))
+	for i, argument := range cmd.Arguments {
+		options.FilterDependencies[i] = argument.Name
 	}
 
-	if len(*filterDeps) == 0 {
-		*filterDeps = append(*filterDeps, "")
+	// Flags
+	options.TargetDirectories = cmd.StringsFrom("-include")
+
+	options.Branch = cmd.StringFrom("-branch")
+	options.CommitMessage = cmd.StringFrom("-message")
+
+	options.Commit = cmd.BoolFrom("-commit")
+	options.PullRequest = cmd.BoolFrom("-pull-request")
+	options.Tag = cmd.BoolFrom("-tag")
+	options.SetVersion = cmd.StringFrom("-set-version")
+
+	nameOnly := cmd.BoolFrom("-name-only")
+	if nameOnly {
+		options.LogLevel = com.NAMEONLY
+	} else {
+		options.LogLevel = com.NORMAL
 	}
 
-	*action = command
 	return
 }
 
-func performPull(branch string, itr *sorter.FileNode) (success bool) {
-	success = true
+func fromArgs() *gomu.MU {
+	options := gomuOptions()
+	common.SetLogLevel(options.LogLevel)
 
-	if itr.File.CheckoutBranch(branch) != nil {
-		itr.File.Output("Failed to checkout " + branch + " :(")
-		success = false
+	if len(options.TargetDirectories) == 0 {
+		options.TargetDirectories = []string{"."}
 	}
 
-	if itr.File.Pull() == nil {
-		itr.File.Output("Pull successful!")
-	} else {
-		itr.File.Output("Failed to pull " + branch + " :(")
-		success = false
-	}
-
-	return
+	return gomu.New(options)
 }
