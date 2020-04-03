@@ -6,9 +6,8 @@ import (
 	"os"
 	"strings"
 
-	com "github.com/hatchify/mod-common"
-	common "github.com/hatchify/mod-common"
 	gomu "github.com/hatchify/mod-utils"
+	"github.com/hatchify/mod-utils/com"
 	flag "github.com/hatchify/parg"
 )
 
@@ -181,7 +180,7 @@ func gomuOptions() (options gomu.Options) {
 
 func fromArgs() *gomu.MU {
 	options := gomuOptions()
-	common.SetLogLevel(options.LogLevel)
+	com.SetLogLevel(options.LogLevel)
 
 	if len(options.TargetDirectories) == 0 {
 		options.TargetDirectories = []string{"."}
