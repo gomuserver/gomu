@@ -156,7 +156,10 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		headCommit = "local"
 	}
 
-	version += "-(" + headCommit + ")"
+	if file.HasChanges() || version != lib.GetCurrentTag() {
+		version += "-(" + headCommit + ")"
+	}
+
 	if currentVersion == version && tagCommit == headCommit {
 		if !file.HasChanges() {
 			file.Output("Version is up to date!")
