@@ -87,11 +87,11 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		}
 
 	} else {
+		// TODO: Check current repo tag, not latest repo tag
 		version = lib.GetCurrentTag()
 		if len(currentVersion) > 0 && currentVersion == version {
 			file.Output("Version is up to date!")
 			return
-
 		}
 	}
 
@@ -111,18 +111,14 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 			file.Output("Failed to checkout " + version + " :(")
 			return
 		}
+		file.Pull()
 
 	} else {
-		if branch, err := file.CurrentBranch(); err == nil {
-			if len(branch) > 0 {
-				file.Output("Setting local gomu repo to: " + branch + "...")
-			}
+		file.Output("Updating source...")
+		if file.Pull() != nil {
+			file.Output("Failed to update source :(")
 		}
-	}
 
-	file.Output("Updating source...")
-	if file.Pull() != nil {
-		file.Output("Failed to update source :(")
 	}
 
 	file.Output("Installing...")
