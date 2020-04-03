@@ -45,7 +45,7 @@ However, they will not attempt to commit or push any changes by themselves.
   Usage: `gomu reset mod-common parg`
 
 
-# Destrucive Commands #
+## Destrucive Commands ##
 Destructive commands can/will attempt to commit and push changes.
 
 If running with -name-only, it will NOT prompt you for a warning.
