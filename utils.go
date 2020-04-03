@@ -158,15 +158,17 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 
 	}
 
-	file.Output("Installing...")
-	if out, err := file.CmdOutput("go", "install", "-i", "-v", "-ldflags=\"-X main.version="+version+" -X main.logLevel=3\"", "-trimpath"); err != nil {
+	file.Output("Installing " + version + "...")
+	com.SetLogLevel(com.DEBUG)
+	if err := file.RunCmd("./install.sh", version); err != nil {
 		// Try again with permissions
-		if out, err = file.CmdOutput("sudo", "go", "install", "-i", "-v", "-ldflags=\"-X main.version="+version+" -X main.logLevel=3\"", "-trimpath"); err != nil {
+		file.Output("Permissions not set... Try again with sudo.")
+		if err = file.RunCmd("sudo", "./install.sh", version); err != nil {
 			file.Output("Failed to install :(")
-			file.Output(out)
 		}
 		return err
 	}
+	com.SetLogLevel(com.NORMAL)
 
 	file.Output("Installed Successfully!")
 	return
