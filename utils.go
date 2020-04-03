@@ -152,17 +152,23 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	}
 	headCommit := string(output)
 
+	if file.HasChanges() {
+		headCommit = "local"
+	}
+
 	version += "-(" + headCommit + ")"
 	if currentVersion == version && tagCommit == headCommit {
-		file.Output("Version is up to date!")
-		return
+		if !file.HasChanges() {
+			file.Output("Version is up to date!")
+			return
+		}
 	}
 
 	file.Output("Installing " + version + "...")
 
 	if err := file.RunCmd("./install.sh", version); err != nil {
 		// Try again with permissions
-		file.Output("Permissions not set... Try again with sudo.")
+		err = nil
 		if err = file.RunCmd("sudo", "./install.sh", version); err != nil {
 			file.Output("Failed to install :(")
 		}
