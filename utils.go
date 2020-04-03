@@ -82,16 +82,53 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	if len(version) > 0 {
 		// Attempt to checkout this version of source
 		if currentVersion == version {
-			file.Output("Version is up to date!")
-			return
-		}
+			var output = ""
+			output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
+			if err != nil {
+				// No tag set. skip tag
+				lib.File.Output("No revision history. Skipping tag.")
+				return
+			}
+			tagCommit := string(output)
 
+			output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
+			if err != nil {
+				// No tag set. skip tag
+				lib.File.Output("No revision head. Skipping tag.")
+				return
+			}
+			headCommit := string(output)
+
+			if tagCommit == headCommit {
+				file.Output("Version is up to date!")
+				return
+			}
+		}
 	} else {
 		// TODO: Check current repo tag, not latest repo tag
 		version = lib.GetCurrentTag()
 		if len(currentVersion) > 0 && currentVersion == version {
-			file.Output("Version is up to date!")
-			return
+			var output = ""
+			output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
+			if err != nil {
+				// No tag set. skip tag
+				lib.File.Output("No revision history. Skipping tag.")
+				return
+			}
+			tagCommit := string(output)
+
+			output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
+			if err != nil {
+				// No tag set. skip tag
+				lib.File.Output("No revision head. Skipping tag.")
+				return
+			}
+			headCommit := string(output)
+
+			if tagCommit == headCommit {
+				file.Output("Version is up to date!")
+				return
+			}
 		}
 	}
 
