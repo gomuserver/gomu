@@ -174,8 +174,8 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		err = nil
 		if err = file.RunCmd("sudo", "./install.sh", version); err != nil {
 			file.Output("Failed to install :(")
+			return err
 		}
-		return err
 	}
 
 	file.Output("Installed Successfully!")
@@ -200,7 +200,7 @@ func getCommand() (cmd *flag.Command, err error) {
 
 	parg.AddAction("sync", "Updates modfiles\n  Conditionally performs extra tasks depending on flags.\n  Usage: `gomu <flags> sync mod-common parg simply <flags>`")
 
-	parg.AddAction("upgrade", "Updates gomu itself!\n  Optionally accepts a version number.\n  Updates to latest version of current branch (or -b if provided).\n  Usage: `gomu upgrade -b master` or `gomu upgrade v0.5.1`")
+	parg.AddAction("upgrade", "Updates gomu itself!\n  Optionally accepts a version number.\n  Without argument, updates to latest tag.\n  Otherwise updates to latest branch/tag provided by first arg or -b.\n  Usage: `gomu upgrade` or `gomu upgrade -b master` or `gomu upgrade v0.5.1`")
 
 	// Configure flags
 	parg.AddGlobalFlag(flag.Flag{ // Directories to search in
