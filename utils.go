@@ -39,16 +39,15 @@ func readInput() {
 	}
 }
 
-func showHelp() {
-	fmt.Println("\nUsage: gomu <flags> <command: [list|pull|replace-local]> | gomu <command: [list|pull|replace-local]> <other flags>")
-	fmt.Println("\nAction Note: command must be a single token before or after all flags/args")
-	fmt.Println("\nFilter/Target Note: accepts multiple -f/-filter/-dep or -t/-target/-dir arguments")
-	fmt.Println("\nView README.md @ https://github.com/hatchify/gomu")
-	fmt.Println("")
+func showHelp(cmd *flag.Command) {
+	if cmd == nil {
+		fmt.Println(flag.Help())
+	} else {
+		fmt.Println(cmd.ShowHelp())
+	}
 }
 
 func exitWithError(message string) {
-	showHelp()
 	com.Errorln(message)
 	os.Exit(1)
 }
@@ -59,51 +58,58 @@ func getCommand() (cmd *flag.Command, err error) {
 	parg := flag.New()
 
 	// Configure commands
-	parg.AddAction("", "")        // Prints Usage
-	parg.AddAction("help", "")    // Prints help
-	parg.AddAction("version", "") // Prints version (if available)
+	parg.AddAction("", "Note - Will accept multiple arguments\n  Aggregate libs to crawl the dependency chain.\n  Providing no arguments will act on files in selected directories\n  (Be Careful!)\n\n  Usage: `gomu <optional flags> cmd args <optional flags>`")
+	parg.AddAction("help", "Prints available commands and flags.\n  Use `gomu help <command> <flags>` to get more specific info")
+	parg.AddAction("version", "Prints current version. Use ./install.sh to get version support")
 
-	parg.AddAction("list", "") // Prints each file in chain
-	parg.AddAction("pull", "") // Pulls latest changes for each file in chain
+	parg.AddAction("list", "Prints each file in dependency chain")
+	parg.AddAction("pull", "Updates branch for file in dependency chain.\n  Providing a -branch will checkout given branch.\n  Creates branch if provided none exists.")
 
-	parg.AddAction("replace", "") // Replaces local for each dep in chain
-	parg.AddAction("reset", "")   // Resets mod files for each dep in chain
+	parg.AddAction("replace", "Replaces each versioned file in the dependency chain\n  Uses the current checked out local copy")
+	parg.AddAction("reset", "Reverts go.mod and go.sum back to last committed version.\n  Usage: `gomu reset mod-common parg`")
 
-	parg.AddAction("sync", "") // Updates mod files for each dep in chain
+	parg.AddAction("sync", "Updates modfiles\n  Conditionally performs extra tasks depending on flags.\n  Usage: `gomu <flags> sync mod-common parg simply <flags>`")
 
 	// Configure flags
 	parg.AddGlobalFlag(flag.Flag{ // Directories to search in
 		Name:        "-include",
 		Identifiers: []string{"-i", "-in", "-include"},
 		Type:        flag.STRINGS,
+		Help:        "Will aggregate files in 1 or more directories.\n  Usage: `gomu list -i hatchify -i vroomy`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Branch to checkout/create
 		Name:        "-branch",
 		Identifiers: []string{"-b", "-branch"},
-	})
-	parg.AddGlobalFlag(flag.Flag{ // Branch to checkout/create
-		Name:        "-message",
-		Identifiers: []string{"-m", "-msg", "-message"},
+		Help:        "Will checkout or create said branch\n  Updating or creating a pull request\n  Depending on command and other flags.\n  Usage: `gomu pull -b feature/Jira-Ticket`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Minimal output for | chains
 		Name:        "-name-only",
 		Identifiers: []string{"-name", "-name-only"},
 		Type:        flag.BOOL,
+		Help:        "Will reduce output to just the filenames changed\n  (ls-styled output for | chaining)\n  Usage: `gomu list -name`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Commits local changes
 		Name:        "-commit",
 		Identifiers: []string{"-c", "-commit"},
 		Type:        flag.BOOL,
+		Help:        "Will commit local changes if present\n  Includes all files outside of mod files\n  Usage: `gomu sync -c`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Creates pull request if possible
 		Name:        "-pull-request",
 		Identifiers: []string{"-pr", "-pull-request"},
 		Type:        flag.BOOL,
+		Help:        "Will create a pull request if possible\n  Fails if on master, or if no changes\n  Usage: `gomu sync -pr`",
+	})
+	parg.AddGlobalFlag(flag.Flag{ // Branch to checkout/create
+		Name:        "-message",
+		Identifiers: []string{"-m", "-msg", "-message"},
+		Help:        "Will set a custom commit message\n  Applies to -c and -pr flags.\n  Usage: `gomu sync -c -m \"Update all the things!\"`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Update tag/version for changed libs or subdeps
 		Name:        "-tag",
 		Identifiers: []string{"-t", "-tag"},
 		Type:        flag.BOOL,
+		Help:        "Will increment tag if new commits since last tag\n  Requires tag previously set\n  Usage: `gomu sync -t`",
 	})
 
 	return flag.Validate()
@@ -117,12 +123,12 @@ func gomuOptions() (options gomu.Options) {
 
 	if err != nil {
 		// Show usage and exit with error
-		showHelp()
+		showHelp(nil)
 		com.Errorln("\nError parsing arguments: ", err)
 		os.Exit(1)
 	}
 	if cmd == nil {
-		showHelp()
+		showHelp(cmd)
 		com.Errorln("\nError parsing command: ", err)
 		os.Exit(1)
 	}
@@ -134,7 +140,7 @@ func gomuOptions() (options gomu.Options) {
 		os.Exit(0)
 	case "help", "", " ":
 		// Print help and exit without error
-		showHelp()
+		showHelp(cmd)
 		os.Exit(0)
 	}
 
