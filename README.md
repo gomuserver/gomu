@@ -81,7 +81,7 @@ However, it is best not to split up flags and commands/args to avoid any acciden
 
 ### [-c -commit] ###
   :: Will commit local changes if present.
-  Includes all files outside of mod files.
+  Includes all changed files in repository.
   Usage: `gomu sync -c`
 
 ### [-pr -pull-request] ###

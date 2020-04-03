@@ -59,13 +59,13 @@ func getCommand() (cmd *flag.Command, err error) {
 
 	// Configure commands
 	parg.AddAction("", "Designed to make working with mod files easier.\n  To learn more, run `gomu help` or `gomu help <command>`\n  (Flags can be added to either help command)")
-	parg.AddAction("help", "Prints available commands and flags.\n  Use `gomu help <command> <flags>` to get more specific info")
-	parg.AddAction("version", "Prints current version. Use ./install.sh to get version support")
+	parg.AddAction("help", "Prints available commands and flags.\n  Use `gomu help <command> <flags>` to get more specific info.")
+	parg.AddAction("version", "Prints current version. Use ./install.sh to get version support.")
 
-	parg.AddAction("list", "Prints each file in dependency chain")
+	parg.AddAction("list", "Prints each file in dependency chain.")
 	parg.AddAction("pull", "Updates branch for file in dependency chain.\n  Providing a -branch will checkout given branch.\n  Creates branch if provided none exists.")
 
-	parg.AddAction("replace", "Replaces each versioned file in the dependency chain\n  Uses the current checked out local copy")
+	parg.AddAction("replace", "Replaces each versioned file in the dependency chain.\n  Uses the current checked out local copy.")
 	parg.AddAction("reset", "Reverts go.mod and go.sum back to last committed version.\n  Usage: `gomu reset mod-common parg`")
 
 	parg.AddAction("sync", "Updates modfiles\n  Conditionally performs extra tasks depending on flags.\n  Usage: `gomu <flags> sync mod-common parg simply <flags>`")
@@ -80,41 +80,41 @@ func getCommand() (cmd *flag.Command, err error) {
 	parg.AddGlobalFlag(flag.Flag{ // Branch to checkout/create
 		Name:        "-branch",
 		Identifiers: []string{"-b", "-branch"},
-		Help:        "Will checkout or create said branch\n  Updating or creating a pull request\n  Depending on command and other flags.\n  Usage: `gomu pull -b feature/Jira-Ticket`",
+		Help:        "Will checkout or create said branch.\n  Updating or creating a pull request.\n  Depending on command and other flags.\n  Usage: `gomu pull -b feature/Jira-Ticket`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Minimal output for | chains
 		Name:        "-name-only",
 		Identifiers: []string{"-name", "-name-only"},
 		Type:        flag.BOOL,
-		Help:        "Will reduce output to just the filenames changed\n  (ls-styled output for | chaining)\n  Usage: `gomu list -name`",
+		Help:        "Will reduce output to just the filenames changed.\n  (ls-styled output for | chaining)\n  Usage: `gomu list -name`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Commits local changes
 		Name:        "-commit",
 		Identifiers: []string{"-c", "-commit"},
 		Type:        flag.BOOL,
-		Help:        "Will commit local changes if present\n  Includes all files outside of mod files\n  Usage: `gomu sync -c`",
+		Help:        "Will commit local changes if present.\n  Includes all changed files in repository.\n  Usage: `gomu sync -c`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Creates pull request if possible
 		Name:        "-pull-request",
 		Identifiers: []string{"-pr", "-pull-request"},
 		Type:        flag.BOOL,
-		Help:        "Will create a pull request if possible\n  Fails if on master, or if no changes\n  Usage: `gomu sync -pr`",
+		Help:        "Will create a pull request if possible.\n  Fails if on master, or if no changes.\n  Usage: `gomu sync -pr`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Branch to checkout/create
 		Name:        "-message",
 		Identifiers: []string{"-m", "-msg", "-message"},
-		Help:        "Will set a custom commit message\n  Applies to -c and -pr flags.\n  Usage: `gomu sync -c -m \"Update all the things!\"`",
+		Help:        "Will set a custom commit message.\n  Applies to -c and -pr flags.\n  Usage: `gomu sync -c -m \"Update all the things!\"`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Update tag/version for changed libs or subdeps
 		Name:        "-tag",
 		Identifiers: []string{"-t", "-tag"},
 		Type:        flag.BOOL,
-		Help:        "Will increment tag if new commits since last tag\n  Requires tag previously set\n  Usage: `gomu sync -t`",
+		Help:        "Will increment tag if new commits since last tag.\n  Requires tag previously set.\n  Usage: `gomu sync -t`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Update tag/version for changed libs or subdeps
 		Name:        "-set-version",
 		Identifiers: []string{"-set", "-set-version"},
-		Help:        "Can be used with -tag to update semver\n  Will force tag version for all deps in chain\n  Usage: `gomu sync -t -set v0.5.0`",
+		Help:        "Can be used with -tag to update sem-ver.\n  Will force tag version for all deps in chain.\n  Usage: `gomu sync -t -set v0.5.0`",
 	})
 
 	return flag.Validate()
