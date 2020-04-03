@@ -8,6 +8,3 @@ require (
 	github.com/hatchify/simply v0.0.15
 )
 
-// Replace Local Deps
-
-replace github.com/hatchify/mod-utils => /Users/lytic/go/src/github.com/hatchify/mod-utils
