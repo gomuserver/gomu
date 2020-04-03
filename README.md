@@ -1,10 +1,12 @@
 # gomu - Go Mod Utils #
 Designed to make working with mod files easier.
 
+
 # Commands #
 Commands are actions taken on the dependency chain.
 
 This is usually parsed as the first non-flag argument passed to the utility.
+
 
 ## Help Commands ##
 Help commands will print usage instructions and details.
@@ -21,7 +23,16 @@ Running help commands with arguments and flags provides more specific contextual
   Use `gomu help <command> <flags>` to get more specific info.
 
 ### gomu version ###
-  :: Prints current version. Use ./install.sh to get version support.
+  :: Prints current version.
+  Install using `gomu upgrade` to get version support.
+
+### gomu upgrade ###
+  :: Updates gomu itself!
+  Optionally accepts a version number.
+  Without argument, updates to latest tag.
+  Otherwise updates to latest branch/tag provided by first arg or -b.
+  Usage: `gomu upgrade` or `gomu upgrade -b master` or `gomu upgrade v0.5.1`
+
 
 ## Local Commands ##
 Local commands can/will make stashes and edits to local files on your working copies.
@@ -45,7 +56,7 @@ However, they will not attempt to commit or push any changes by themselves.
   Usage: `gomu reset mod-common parg`
 
 
-## Destrucive Commands ##
+## Destructive Commands ##
 Destructive commands can/will attempt to commit and push changes.
 
 If running with -name-only, it will NOT prompt you for a warning.
@@ -56,6 +67,7 @@ Please be careful!
   :: Updates modfiles
   Conditionally performs extra tasks depending on flags.
   Usage: `gomu <flags> sync mod-common parg simply <flags>`
+
 
 # Flags #
 Flags are options that can be set for some commands. 

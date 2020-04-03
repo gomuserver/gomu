@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/user"
+	"path"
 	"strings"
 
-	com "github.com/hatchify/mod-common"
-	common "github.com/hatchify/mod-common"
 	gomu "github.com/hatchify/mod-utils"
+	"github.com/hatchify/mod-utils/com"
 	flag "github.com/hatchify/parg"
 )
 
@@ -52,6 +53,135 @@ func exitWithError(message string) {
 	os.Exit(1)
 }
 
+func upgradeGomu(cmd *flag.Command) (err error) {
+	var lib gomu.Library
+	var file com.FileWrapper
+	usr, err := user.Current()
+	if err != nil {
+		com.Println("gomu :: Unable to get current user dir :(")
+		return
+	}
+	file.Path = path.Join(usr.HomeDir, "go", "src", "github.com", "hatchify", "gomu")
+	lib.File = &file
+
+	version := ""
+	if len(cmd.Arguments) > 0 {
+		// Set version from args
+		if val, ok := cmd.Arguments[0].Value.(string); ok {
+			version = val
+		} else {
+			version = cmd.Arguments[0].Name
+		}
+	} else {
+		version = cmd.StringFrom("-branch")
+	}
+
+	file.Output("Checking Installation...")
+	currentVersion, _ := file.CmdOutput("gomu", "version")
+
+	if len(version) > 0 {
+		// Attempt to checkout this version of source
+	} else {
+		// TODO: Check current repo tag, not latest repo tag
+		version = lib.GetCurrentTag()
+		if len(currentVersion) > 0 && currentVersion == version {
+			var output = ""
+			output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
+			if err != nil {
+				// No tag set. skip tag
+				lib.File.Output("No revision history. Skipping tag.")
+				return
+			}
+			tagCommit := string(output)
+
+			output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
+			if err != nil {
+				// No tag set. skip tag
+				lib.File.Output("No revision head. Skipping tag.")
+				return
+			}
+			headCommit := string(output)
+
+			if tagCommit == headCommit {
+				file.Output("Version is up to date!")
+				return
+			}
+		}
+	}
+
+	msg := version
+	if len(msg) == 0 {
+		msg = "latest"
+	}
+	file.Output("Upgrading Installation from " + currentVersion + " to " + version + "...")
+	if file.Fetch() != nil {
+		file.Output("Failed to update refs :(")
+	}
+
+	if len(version) > 0 {
+		file.Output("Setting local gomu repo to: " + version + "...")
+
+		if err = file.CheckoutBranch(version); err != nil {
+			file.Output("Failed to checkout " + version + " :(")
+			return
+		}
+		file.Pull()
+
+	} else {
+		file.Output("Updating source...")
+		if file.Pull() != nil {
+			file.Output("Failed to update source :(")
+		}
+
+	}
+
+	var output = ""
+	output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
+	if err != nil {
+		// No tag set. skip tag
+		lib.File.Output("No revision history. Skipping tag.")
+		return
+	}
+	tagCommit := string(output)
+
+	output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
+	if err != nil {
+		// No tag set. skip tag
+		lib.File.Output("No revision head. Skipping tag.")
+		return
+	}
+	headCommit := string(output)
+
+	if file.HasChanges() {
+		headCommit = "local"
+	}
+
+	if file.HasChanges() || version != lib.GetCurrentTag() {
+		version += "-(" + headCommit + ")"
+	}
+
+	if currentVersion == version && tagCommit == headCommit {
+		if !file.HasChanges() {
+			file.Output("Version is up to date!")
+			return
+		}
+	}
+
+	file.Output("Installing " + version + "...")
+
+	if err := file.RunCmd("./install.sh", version); err != nil {
+		// Try again with permissions
+		err = nil
+		if err = file.RunCmd("sudo", "./install.sh", version); err != nil {
+			file.Output("Failed to install :(")
+			return err
+		}
+	}
+
+	file.Output("Installed Successfully!")
+	return
+}
+
 // Parg will parse your args
 func getCommand() (cmd *flag.Command, err error) {
 	// Command/Arg/Flag parser
@@ -60,7 +190,7 @@ func getCommand() (cmd *flag.Command, err error) {
 	// Configure commands
 	parg.AddAction("", "Designed to make working with mod files easier.\n  To learn more, run `gomu help` or `gomu help <command>`\n  (Flags can be added to either help command)")
 	parg.AddAction("help", "Prints available commands and flags.\n  Use `gomu help <command> <flags>` to get more specific info.")
-	parg.AddAction("version", "Prints current version. Use ./install.sh to get version support.")
+	parg.AddAction("version", "Prints current version.\n  Install using `gomu upgrade` to get version support.")
 
 	parg.AddAction("list", "Prints each file in dependency chain.")
 	parg.AddAction("pull", "Updates branch for file in dependency chain.\n  Providing a -branch will checkout given branch.\n  Creates branch if provided none exists.")
@@ -69,6 +199,8 @@ func getCommand() (cmd *flag.Command, err error) {
 	parg.AddAction("reset", "Reverts go.mod and go.sum back to last committed version.\n  Usage: `gomu reset mod-common parg`")
 
 	parg.AddAction("sync", "Updates modfiles\n  Conditionally performs extra tasks depending on flags.\n  Usage: `gomu <flags> sync mod-common parg simply <flags>`")
+
+	parg.AddAction("upgrade", "Updates gomu itself!\n  Optionally accepts a version number.\n  Without argument, updates to latest tag.\n  Otherwise updates to latest branch/tag provided by first arg or -b.\n  Usage: `gomu upgrade` or `gomu upgrade -b master` or `gomu upgrade v0.5.1`")
 
 	// Configure flags
 	parg.AddGlobalFlag(flag.Flag{ // Directories to search in
@@ -124,8 +256,6 @@ func gomuOptions() (options gomu.Options) {
 	// Get command from args
 	cmd, err := getCommand()
 
-	// TODO: cmd.Help() && parg.Help()
-
 	if err != nil {
 		// Show usage and exit with error
 		showHelp(nil)
@@ -146,6 +276,9 @@ func gomuOptions() (options gomu.Options) {
 	case "help", "":
 		// Print help and exit without error
 		showHelp(cmd)
+		os.Exit(0)
+	case "upgrade":
+		upgradeGomu(cmd)
 		os.Exit(0)
 	}
 
@@ -181,7 +314,7 @@ func gomuOptions() (options gomu.Options) {
 
 func fromArgs() *gomu.MU {
 	options := gomuOptions()
-	common.SetLogLevel(options.LogLevel)
+	com.SetLogLevel(options.LogLevel)
 
 	if len(options.TargetDirectories) == 0 {
 		options.TargetDirectories = []string{"."}

@@ -1,8 +1,8 @@
 package main
 
 import (
-	com "github.com/hatchify/mod-common"
 	gomu "github.com/hatchify/mod-utils"
+	com "github.com/hatchify/mod-utils/com"
 )
 
 func main() {
