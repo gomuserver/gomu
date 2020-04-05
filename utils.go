@@ -132,7 +132,6 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		if file.Pull() != nil {
 			file.Output("Failed to update source :(")
 		}
-
 	}
 
 	var output = ""
