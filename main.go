@@ -1,18 +1,18 @@
 package main
 
 import (
-	gomu "github.com/hatchify/mod-utils"
+	mod "github.com/hatchify/mod-utils"
 	com "github.com/hatchify/mod-utils/com"
 )
 
 func main() {
 	// Parse command line values, check supported functions, set defaults
-	mu := fromArgs()
+	gomu := fromArgs()
 
-	gomu.RunThen(mu, printOutput)
+	gomu.RunThen(printOutput)
 }
 
-func printOutput(mu *gomu.MU) {
+func printOutput(mu *mod.MU) {
 	if len(mu.Errors) > 0 {
 		if mu.Options.Action != "list" {
 			com.Println("")
@@ -21,7 +21,7 @@ func printOutput(mu *gomu.MU) {
 		com.Println("Quitting with errors:\n", mu.Errors)
 		com.Println("")
 	} else {
-		com.Println("All clean!\n ")
+		com.Println("\nAll clean!\n ")
 		com.Println(mu.Stats.Format())
 	}
 }
