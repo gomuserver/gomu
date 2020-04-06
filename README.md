@@ -55,6 +55,11 @@ However, they will not attempt to commit or push any changes by themselves.
   :: Reverts go.mod and go.sum back to last committed version.
   Usage: `gomu reset mod-common parg`
 
+### gomu test ###
+  :: Runs `go test` on each library in the dependency chain.
+  Prints names of failing libraries.
+  Usage: `gomu test mod-common`
+
 
 ## Destructive Commands ##
 Destructive commands can/will attempt to commit and push changes.

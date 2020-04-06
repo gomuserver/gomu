@@ -196,6 +196,7 @@ func getCommand() (cmd *flag.Command, err error) {
 
 	parg.AddAction("replace", "Replaces each versioned file in the dependency chain.\n  Uses the current checked out local copy.")
 	parg.AddAction("reset", "Reverts go.mod and go.sum back to last committed version.\n  Usage: `gomu reset mod-common parg`")
+	parg.AddAction("test", "Runs `go test` on each library in the dependency chain.\n  Prints names of failing libraries.\n  Usage: `gomu test mod-common`")
 
 	parg.AddAction("sync", "Updates modfiles\n  Conditionally performs extra tasks depending on flags.\n  Usage: `gomu <flags> sync mod-common parg simply <flags>`")
 
