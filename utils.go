@@ -176,6 +176,10 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 			file.Output("Failed to install :(")
 			return err
 		}
+		// Fix pkg permission issues
+		if usr, err := user.Current(); err == nil {
+			file.RunCmd("sudo", "chown", "-R", usr.Name, path.Join(usr.HomeDir, "go", "pkg"))
+		}
 	}
 
 	file.Output("Installed Successfully!")
