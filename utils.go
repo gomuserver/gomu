@@ -44,7 +44,7 @@ func showHelp(cmd *flag.Command) {
 	if cmd == nil {
 		fmt.Println(flag.Help())
 	} else {
-		fmt.Println(cmd.ShowHelp())
+		fmt.Println(cmd.Help())
 	}
 }
 
