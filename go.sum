@@ -2,8 +2,8 @@ github.com/hatchify/atoms v0.4.76 h1:V/n4MqTIDDd1W0odE3kMpZT3QWOfOX/sOiZaL2lMPrE
 github.com/hatchify/atoms v0.4.76/go.mod h1:6H72BaBb4o7EHfkGXb3AriWU0S5CSrW1kDDHdjdeNB8=
 github.com/hatchify/closer v0.4.76 h1:jNcwEw3pp7vbjUThK0ibqPQWrLHVlm1rS1rHPzuvDIg=
 github.com/hatchify/closer v0.4.76/go.mod h1:tfyzmFpmixIOlPH/dZvmcyeLpfxRd85nas5vP6eomuE=
-github.com/hatchify/mod-utils v0.5.9 h1:A0SA+H64s7wSLlfr7pxHpq+rN6OTPtwPY55pwJy+fvM=
-github.com/hatchify/mod-utils v0.5.9/go.mod h1:ocioCLf4/tLSdCGtMccwV6Ha969hLZQLPFvYGCVEpTE=
+github.com/hatchify/mod-utils v0.5.10 h1:p8wWBl6rrizoMjaWKbxNmAeSuFUiRl8VAndPZF5HMpE=
+github.com/hatchify/mod-utils v0.5.10/go.mod h1:ocioCLf4/tLSdCGtMccwV6Ha969hLZQLPFvYGCVEpTE=
 github.com/hatchify/parg v0.1.16 h1:AW5PjzB07c7GcOzEhWhK4wUwsYKHlSYbuWIN3dhGKcY=
 github.com/hatchify/parg v0.1.16/go.mod h1:JS52bGPjkpjCvRvWrrBR/c5mYufgJgTMr8cG6xR4YtQ=
 github.com/hatchify/simply v0.0.15 h1:k7FB9dOMZ0d1pV/nRyAtaXRAAB5udYbJH9Iq2rSTwwQ=
