@@ -65,6 +65,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	lib.File = &file
 
 	version := ""
+	originalBranch, _ := lib.File.CurrentBranch()
 	if len(cmd.Arguments) > 0 {
 		// Set version from args
 		if val, ok := cmd.Arguments[0].Value.(string); ok {
@@ -178,6 +179,11 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	}
 
 	file.Output("Installed Successfully!")
+
+	if len(originalBranch) > 0 {
+		file.CheckoutBranch(originalBranch)
+	}
+
 	return
 }
 
