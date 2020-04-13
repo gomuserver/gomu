@@ -96,6 +96,11 @@ However, it is best not to split up flags and commands/args to avoid any acciden
   (ls-styled output for | chaining)
   Usage: `gomu list -name`
 
+### [-direct -direct-import] ###
+  :: Will avoid recursion in dependency sorting.
+  Only includes deps in go.mod (not go.sum).
+  Usage: `gomu list mod-utils -direct`
+
 ### [-c -commit] ###
   :: Will commit local changes if present.
   Includes all changed files in repository.

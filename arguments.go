@@ -46,7 +46,7 @@ func configureCommand() (cmd *flag.Command, err error) {
 		Name:        "-direct-import",
 		Identifiers: []string{"-direct", "-direct-import"},
 		Type:        flag.BOOL,
-		Help:        "Will avoid recursion in dependency sorting.\n  Only includes deps in go.mod (not go.sum).\n  Usage: `gomu list mod=utils -direct`",
+		Help:        "Will avoid recursion in dependency sorting.\n  Only includes deps in go.mod (not go.sum).\n  Usage: `gomu list mod-utils -direct`",
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Minimal output for | chains
 		Name:        "-name-only",
