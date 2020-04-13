@@ -13,7 +13,7 @@ func TestParse_Empty(context *testing.T) {
 	input := "gomu"
 	os.Args = strings.Split(input, " ")
 
-	command, err := getCommand()
+	command, err := configureCommand()
 
 	errTest := simply.Target(err, context, "Error should be nil")
 	errTest.Assert().Equals(nil)
@@ -44,7 +44,7 @@ func TestConfig_1Flag_1FlagMatch_1BoolFlag_Cmd_1Flag_2Arg_2FlagArrayMatch(contex
 	input := "gomu -include test1 -include test2 -name-only sync -b JIRA-Ticket mod-common simply -i hatchify vroomy"
 	os.Args = strings.Split(input, " ")
 
-	command, err := getCommand()
+	command, err := configureCommand()
 
 	test := simply.Target(err, context, "Error should not exist")
 	result := test.Assert().Equals(nil)
@@ -103,7 +103,7 @@ func TestConfig_1BoolFlag_2FlagArray_Cmd_1Flag_1Arg_1BoolFlag_1Arg_2FlagArrayMat
 	input := "gomu -name -include test1 -include test2 sync -b JIRA-Ticket mod-common -c simply -i hatchify vroomy -pr"
 	os.Args = strings.Split(input, " ")
 
-	command, err := getCommand()
+	command, err := configureCommand()
 
 	test := simply.Target(err, context, "Error should not exist")
 	result := test.Assert().Equals(nil)
@@ -172,7 +172,7 @@ func TestConfig_1BoolFlag_2FlagArray_1BoolFlag_Cmd_1Flag_1Arg_1BoolFlag_1Arg_2Fl
 	input := "gomu -name -include test1 test2 -pr sync -b JIRA-Ticket mod-common -c simply -i hatchify vroomy"
 	os.Args = strings.Split(input, " ")
 
-	command, err := getCommand()
+	command, err := configureCommand()
 
 	test := simply.Target(err, context, "Error should not exist")
 	result := test.Assert().Equals(nil)
@@ -241,7 +241,7 @@ func TestConfig_1BoolFlag_3FlagArrayCmdMatch_Cmd_1Flag_1Arg_1BoolFlag_1Arg_2Flag
 	input := "gomu -name -include test1 test2 sync list -b JIRA-Ticket mod-common -c simply -i hatchify vroomy -pr"
 	os.Args = strings.Split(input, " ")
 
-	command, err := getCommand()
+	command, err := configureCommand()
 
 	test := simply.Target(err, context, "Error should not exist")
 	result := test.Assert().Equals(nil)
