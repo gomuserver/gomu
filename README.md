@@ -69,10 +69,19 @@ If running with -name-only, it will NOT prompt you for a warning.
 Please be careful!
 
 ### gomu sync ###
-  :: Updates modfiles
+  :: Updates modfiles.
   Conditionally performs extra tasks depending on flags.
   Usage: `gomu <flags> sync mod-common parg simply <flags>`
 
+### gomu workflow ###
+  :: Adds a github workflow to a repo.
+  Requires -source <template path>.
+  Usage: `gomu workflow mod-utils -c -b new-workflow -source workflows/templates/autotag.yml`
+
+### gomu secret ###
+  :: Adds a secret to a repo's github actions.
+  Requires -source <file containing secret>.
+  Usage: `gomu secret mod-utils -source ~/.ssh/server_key.crt`
 
 # Flags #
 Flags are options that can be set for some commands. 
@@ -126,3 +135,7 @@ However, it is best not to split up flags and commands/args to avoid any acciden
   Will force tag version for all deps in chain.
   Usage: `gomu sync -t -set v0.5.0`
 
+### [-source -source-path] ###
+  :: Required for workflow and secret commands.
+  Will provide a source template or secret file.
+  Usage: `gomu workflow mod-utils -source path/to/template.yml`
