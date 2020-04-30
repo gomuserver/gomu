@@ -63,6 +63,8 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 				file.Output("Version is up to date!")
 				return
 			}
+
+			file.Output("There appears to be an untagged commit!")
 		}
 	}
 
