@@ -96,14 +96,19 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	if err != nil {
 		// No tag set. skip tag
 		lib.File.Output("No revision history. Skipping tag.")
+		if len(originalBranch) > 0 {
+			file.CheckoutBranch(originalBranch)
+		}
 		return
 	}
 	tagCommit := string(output)
 
 	output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
 	if err != nil {
-		// No tag set. skip tag
-		lib.File.Output("No revision head. Skipping tag.")
+		lib.File.Output("No revision head. Cannot checkout version.")
+		if len(originalBranch) > 0 {
+			file.CheckoutBranch(originalBranch)
+		}
 		return
 	}
 	headCommit := string(output)
@@ -119,6 +124,9 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	if currentVersion == version && tagCommit == headCommit {
 		if !file.HasChanges() {
 			file.Output("Version is up to date!")
+			if len(originalBranch) > 0 {
+				file.CheckoutBranch(originalBranch)
+			}
 			return
 		}
 	}
@@ -130,6 +138,9 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		err = nil
 		if err = file.RunCmd("sudo", "./install.sh", version); err != nil {
 			file.Output("Failed to install :(")
+			if len(originalBranch) > 0 {
+				file.CheckoutBranch(originalBranch)
+			}
 			return err
 		}
 		// Fix pkg permission issues
