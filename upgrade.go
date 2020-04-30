@@ -40,7 +40,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		// Attempt to checkout this version of source
 	} else {
 		// TODO: Check current repo tag, not latest repo tag
-		version = lib.GetCurrentTag()
+		version = lib.GetLatestTag()
 		if len(currentVersion) > 0 && currentVersion == version {
 			var output = ""
 			output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
@@ -73,9 +73,6 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		msg = "latest"
 	}
 	file.Output("Upgrading Installation from " + currentVersion + " to " + version + "...")
-	if file.Fetch() != nil {
-		file.Output("Failed to update refs :(")
-	}
 
 	if len(version) > 0 {
 		file.Output("Setting local gomu repo to: " + version + "...")
@@ -119,7 +116,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		headCommit = "local"
 	}
 
-	if file.HasChanges() || version != lib.GetCurrentTag() {
+	if file.HasChanges() || version != lib.GetLatestTag() {
 		version += "-(" + headCommit + ")"
 	}
 
