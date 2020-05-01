@@ -10,18 +10,28 @@ import (
 )
 
 func upgradeGomu(cmd *flag.Command) (err error) {
-	var lib gomu.Library
-	var file com.FileWrapper
-	usr, err := user.Current()
+	var (
+		lib            gomu.Library
+		file           com.FileWrapper
+		currentVersion string
+		originalBranch string
+		tagCommit      string
+		headCommit     string
+		latestTag      string
+		hasChanges     bool
+		usr            *user.User
+	)
+
+	usr, err = user.Current()
 	if err != nil {
 		com.Println("gomu :: Unable to get current user dir :(")
 		return
 	}
+
 	file.Path = path.Join(usr.HomeDir, "go", "src", "github.com", "hatchify", "gomu")
 	lib.File = &file
 
 	version := ""
-	originalBranch, _ := lib.File.CurrentBranch()
 	if len(cmd.Arguments) > 0 {
 		// Set version from args
 		if val, ok := cmd.Arguments[0].Value.(string); ok {
@@ -34,37 +44,43 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	}
 
 	file.Output("Checking Installation...")
-	currentVersion, _ := file.CmdOutput("gomu", "version")
+	currentVersion, _ = file.CmdOutput("gomu", "version")
+	originalBranch, _ = lib.File.CurrentBranch()
+	hasChanges = file.HasChanges()
+	latestTag = lib.GetLatestTag()
 
 	if len(version) > 0 {
 		// Attempt to checkout this version of source
 	} else {
-		// TODO: Check current repo tag, not latest repo tag
-		version = lib.GetLatestTag()
+		version = latestTag
 		if len(currentVersion) > 0 && currentVersion == version {
 			var output = ""
-			output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
-			if err != nil {
+			if output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version); err != nil {
 				// No tag set. skip tag
 				lib.File.Output("No revision history. Skipping tag.")
 				return
 			}
-			tagCommit := string(output)
 
-			output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
-			if err != nil {
+			tagCommit = string(output)
+
+			if output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD"); err != nil {
 				// No tag set. skip tag
 				lib.File.Output("No revision head. Skipping tag.")
 				return
 			}
-			headCommit := string(output)
+
+			headCommit = string(output)
 
 			if tagCommit == headCommit {
-				file.Output("Version is up to date!")
-				return
+				if hasChanges {
+					file.Output("There appears to be local changes...")
+				} else {
+					file.Output("Version is up to date!")
+					return
+				}
+			} else {
+				file.Output("There appears to be an untagged commit...")
 			}
-
-			file.Output("There appears to be an untagged commit!")
 		}
 	}
 
@@ -90,33 +106,38 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		}
 	}
 
-	var output = ""
-	output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
-	if err != nil {
-		// No tag set. skip tag
-		lib.File.Output("No revision history. Skipping tag.")
-		if len(originalBranch) > 0 {
-			file.CheckoutBranch(originalBranch)
-		}
-		return
-	}
-	tagCommit := string(output)
-
-	output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
-	if err != nil {
-		lib.File.Output("No revision head. Cannot checkout version.")
-		if len(originalBranch) > 0 {
-			file.CheckoutBranch(originalBranch)
-		}
-		return
-	}
-	headCommit := string(output)
-
-	if file.HasChanges() {
+	if hasChanges {
 		headCommit = "local"
+	} else {
+		var output = ""
+		if tagCommit == "" {
+			output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
+			if err != nil {
+				// No tag set. skip tag
+				lib.File.Output("No revision history. Skipping tag.")
+				if len(originalBranch) > 0 {
+					file.CheckoutBranch(originalBranch)
+				}
+				return
+			}
+			tagCommit = string(output)
+		}
+
+		if headCommit == "" {
+			output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
+			if err != nil {
+				lib.File.Output("No revision head. Cannot checkout version.")
+				if len(originalBranch) > 0 {
+					file.CheckoutBranch(originalBranch)
+				}
+				return
+			}
+
+			headCommit = string(output)
+		}
 	}
 
-	if file.HasChanges() || version != lib.GetLatestTag() {
+	if hasChanges || version != latestTag {
 		version += "-(" + headCommit + ")"
 	}
 
