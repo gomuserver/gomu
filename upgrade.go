@@ -97,6 +97,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 			file.Output("Failed to checkout " + version + " :(")
 			return
 		}
+
 		file.Pull()
 
 	} else {
@@ -120,6 +121,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 				}
 				return
 			}
+
 			tagCommit = string(output)
 		}
 
@@ -137,16 +139,18 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		}
 	}
 
+	// TODO: Check current tag instead of latest tag?
 	if hasChanges || version != latestTag {
 		version += "-(" + headCommit + ")"
 	}
 
 	if currentVersion == version && tagCommit == headCommit {
-		if !file.HasChanges() {
+		if !hasChanges {
 			file.Output("Version is up to date!")
 			if len(originalBranch) > 0 {
 				file.CheckoutBranch(originalBranch)
 			}
+
 			return
 		}
 	}
@@ -163,10 +167,9 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 			}
 			return err
 		}
+
 		// Fix pkg permission issues
-		if usr, err := user.Current(); err == nil {
-			file.RunCmd("sudo", "chown", "-R", usr.Name, path.Join(usr.HomeDir, "go", "pkg"))
-		}
+		file.RunCmd("sudo", "chown", "-R", usr.Name, path.Join(usr.HomeDir, "go", "pkg"))
 	}
 
 	file.Output("Installed Successfully!")
