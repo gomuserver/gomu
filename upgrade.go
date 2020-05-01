@@ -88,6 +88,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	if len(msg) == 0 {
 		msg = "latest"
 	}
+
 	lib.File.Output("Upgrading Installation from " + currentVersion + " to " + version + "...")
 
 	if len(version) > 0 {
@@ -109,6 +110,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 
 	if hasChanges {
 		headCommit = "local"
+
 	} else {
 		var output = ""
 		if tagCommit == "" {
