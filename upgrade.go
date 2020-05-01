@@ -103,6 +103,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 
 	} else {
 		lib.File.Output("Updating source...")
+
 		if lib.File.Pull() != nil {
 			lib.File.Output("Failed to update source :(")
 		}
@@ -115,9 +116,11 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		var output = ""
 		if tagCommit == "" {
 			output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
+
 			if err != nil {
 				// No tag set. skip tag
 				lib.File.Output("No revision history. Skipping tag.")
+
 				if len(originalBranch) > 0 {
 					lib.File.CheckoutBranch(originalBranch)
 				}
@@ -131,6 +134,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 			output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
 			if err != nil {
 				lib.File.Output("No revision head. Cannot checkout version.")
+
 				if len(originalBranch) > 0 {
 					lib.File.CheckoutBranch(originalBranch)
 				}
@@ -149,6 +153,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	if currentVersion == version && tagCommit == headCommit {
 		if !hasChanges {
 			lib.File.Output("Version is up to date!")
+
 			if len(originalBranch) > 0 {
 				lib.File.CheckoutBranch(originalBranch)
 			}
@@ -164,6 +169,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		err = nil
 		if err = lib.File.RunCmd("sudo", "./install.sh", version); err != nil {
 			lib.File.Output("Failed to install :(")
+
 			if len(originalBranch) > 0 {
 				lib.File.CheckoutBranch(originalBranch)
 			}
