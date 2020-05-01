@@ -12,6 +12,7 @@ import (
 func upgradeGomu(cmd *flag.Command) (err error) {
 	var (
 		lib            gomu.Library
+		output         string
 		version        string
 		currentVersion string
 		originalBranch string
@@ -53,7 +54,6 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 	} else {
 		version = latestTag
 		if len(currentVersion) > 0 && currentVersion == version {
-			var output = ""
 			if output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version); err != nil {
 				// No tag set. skip tag
 				lib.File.Output("No revision history. Skipping tag.")
@@ -113,7 +113,6 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		headCommit = "local"
 
 	} else {
-		var output = ""
 		if tagCommit == "" {
 			output, err = lib.File.CmdOutput("git", "rev-list", "-n", "1", version)
 
@@ -132,6 +131,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 
 		if headCommit == "" {
 			output, err = lib.File.CmdOutput("git", "rev-parse", "HEAD")
+
 			if err != nil {
 				lib.File.Output("No revision head. Cannot checkout version.")
 
