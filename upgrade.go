@@ -12,11 +12,11 @@ import (
 func upgradeGomu(cmd *flag.Command) (err error) {
 	var (
 		lib            gomu.Library
-		file           com.FileWrapper
+		version        string
 		currentVersion string
 		originalBranch string
-		tagCommit      string
 		headCommit     string
+		tagCommit      string
 		latestTag      string
 		hasChanges     bool
 		usr            *user.User
@@ -28,10 +28,9 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		return
 	}
 
-	file.Path = path.Join(usr.HomeDir, "go", "src", "github.com", "hatchify", "gomu")
-	lib.File = &file
+	lib.File = &com.FileWrapper{}
+	lib.File.Path = path.Join(usr.HomeDir, "go", "src", "github.com", "hatchify", "gomu")
 
-	version := ""
 	if len(cmd.Arguments) > 0 {
 		// Set version from args
 		if val, ok := cmd.Arguments[0].Value.(string); ok {
@@ -43,10 +42,10 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		version = cmd.StringFrom("-branch")
 	}
 
-	file.Output("Checking Installation...")
-	currentVersion, _ = file.CmdOutput("gomu", "version")
+	lib.File.Output("Checking Installation...")
+	currentVersion, _ = lib.File.CmdOutput("gomu", "version")
 	originalBranch, _ = lib.File.CurrentBranch()
-	hasChanges = file.HasChanges()
+	hasChanges = lib.File.HasChanges()
 	latestTag = lib.GetLatestTag()
 
 	if len(version) > 0 {
@@ -73,37 +72,38 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 
 			if tagCommit == headCommit {
 				if hasChanges {
-					file.Output("There appears to be local changes...")
+					lib.File.Output("There appears to be local changes...")
 				} else {
-					file.Output("Version is up to date!")
+					lib.File.Output("Version is up to date!")
 					return
 				}
 			} else {
-				file.Output("There appears to be an untagged commit...")
+				lib.File.Output("There appears to be an untagged commit...")
 			}
 		}
 	}
 
-	msg := version
+	var msg string
+	msg = version
 	if len(msg) == 0 {
 		msg = "latest"
 	}
-	file.Output("Upgrading Installation from " + currentVersion + " to " + version + "...")
+	lib.File.Output("Upgrading Installation from " + currentVersion + " to " + version + "...")
 
 	if len(version) > 0 {
-		file.Output("Setting local gomu repo to: " + version + "...")
+		lib.File.Output("Setting local gomu repo to: " + version + "...")
 
-		if err = file.CheckoutBranch(version); err != nil {
-			file.Output("Failed to checkout " + version + " :(")
+		if err = lib.File.CheckoutBranch(version); err != nil {
+			lib.File.Output("Failed to checkout " + version + " :(")
 			return
 		}
 
-		file.Pull()
+		lib.File.Pull()
 
 	} else {
-		file.Output("Updating source...")
-		if file.Pull() != nil {
-			file.Output("Failed to update source :(")
+		lib.File.Output("Updating source...")
+		if lib.File.Pull() != nil {
+			lib.File.Output("Failed to update source :(")
 		}
 	}
 
@@ -117,7 +117,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 				// No tag set. skip tag
 				lib.File.Output("No revision history. Skipping tag.")
 				if len(originalBranch) > 0 {
-					file.CheckoutBranch(originalBranch)
+					lib.File.CheckoutBranch(originalBranch)
 				}
 				return
 			}
@@ -130,7 +130,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 			if err != nil {
 				lib.File.Output("No revision head. Cannot checkout version.")
 				if len(originalBranch) > 0 {
-					file.CheckoutBranch(originalBranch)
+					lib.File.CheckoutBranch(originalBranch)
 				}
 				return
 			}
@@ -146,36 +146,36 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 
 	if currentVersion == version && tagCommit == headCommit {
 		if !hasChanges {
-			file.Output("Version is up to date!")
+			lib.File.Output("Version is up to date!")
 			if len(originalBranch) > 0 {
-				file.CheckoutBranch(originalBranch)
+				lib.File.CheckoutBranch(originalBranch)
 			}
 
 			return
 		}
 	}
 
-	file.Output("Installing " + version + "...")
+	lib.File.Output("Installing " + version + "...")
 
-	if err := file.RunCmd("./install.sh", version); err != nil {
+	if err = lib.File.RunCmd("./install.sh", version); err != nil {
 		// Try again with permissions
 		err = nil
-		if err = file.RunCmd("sudo", "./install.sh", version); err != nil {
-			file.Output("Failed to install :(")
+		if err = lib.File.RunCmd("sudo", "./install.sh", version); err != nil {
+			lib.File.Output("Failed to install :(")
 			if len(originalBranch) > 0 {
-				file.CheckoutBranch(originalBranch)
+				lib.File.CheckoutBranch(originalBranch)
 			}
 			return err
 		}
 
 		// Fix pkg permission issues
-		file.RunCmd("sudo", "chown", "-R", usr.Name, path.Join(usr.HomeDir, "go", "pkg"))
+		lib.File.RunCmd("sudo", "chown", "-R", usr.Name, path.Join(usr.HomeDir, "go", "pkg"))
 	}
 
-	file.Output("Installed Successfully!")
+	lib.File.Output("Installed Successfully!")
 
 	if len(originalBranch) > 0 {
-		file.CheckoutBranch(originalBranch)
+		lib.File.CheckoutBranch(originalBranch)
 	}
 
 	return
