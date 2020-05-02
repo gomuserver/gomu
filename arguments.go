@@ -29,7 +29,7 @@ func configureCommand() (cmd *flag.Command, err error) {
 	parg.AddAction("sync", "Updates modfiles.\n  Conditionally performs extra tasks depending on flags.\n  Usage: `gomu <flags> sync mod-common parg simply <flags>`")
 
 	parg.AddAction("workflow", "Adds a github workflow to a repo.\n  Requires -source <template path>.\n  Usage: `gomu workflow mod-utils -c -b new-workflow -source workflows/templates/autotag.yml`")
-	parg.AddAction("secret", "Adds a secret to a repo's github actions.\n  Requires -source <file containing secret>.\n  Usage: `gomu secret mod-utils -source ~/.ssh/server_key.crt`")
+	//parg.AddAction("secret", "Adds a secret to a repo's github actions.\n  Requires -source <file containing secret>.\n  Usage: `gomu secret mod-utils -source ~/.ssh/server_key.crt`")
 
 	parg.AddAction("upgrade", "Updates gomu itself!\n  Optionally accepts a version number.\n  Without argument, updates to latest tag.\n  Otherwise updates to latest branch/tag provided by first arg or -b.\n  Usage: `gomu upgrade` or `gomu upgrade -b master` or `gomu upgrade v0.5.1`")
 
@@ -87,7 +87,7 @@ func configureCommand() (cmd *flag.Command, err error) {
 	})
 	parg.AddGlobalFlag(flag.Flag{ // Update tag/version for changed libs or subdeps
 		Name:        "-source-path",
-		Identifiers: []string{"-source", "-source-path"},
+		Identifiers: []string{"-s", "-source", "-source-path"},
 		Help:        "Required for workflow and secret commands.\n  Will provide a source template or secret file.\n  Usage: `gomu workflow mod-utils -source path/to/template.yml`",
 	})
 
