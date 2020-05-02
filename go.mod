@@ -3,7 +3,7 @@ module github.com/hatchify/gomu
 go 1.14
 
 require (
-	github.com/hatchify/mod-utils v0.5.48
+	github.com/hatchify/mod-utils v0.5.49
 	github.com/hatchify/parg v0.1.19
 	github.com/hatchify/simply v0.0.16
 )
