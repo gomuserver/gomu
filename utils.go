@@ -39,9 +39,9 @@ func readInput() {
 
 func showHelp(cmd *flag.Command) {
 	if cmd == nil {
-		fmt.Println(flag.Help())
+		fmt.Println("# gomu :: Usage ::\n" + flag.Help(true))
 	} else {
-		fmt.Println(cmd.Help())
+		fmt.Println("# gomu :: Usage ::\n" + cmd.Help(true))
 	}
 }
 
