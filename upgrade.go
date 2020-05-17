@@ -43,7 +43,7 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 		version = cmd.StringFrom("-branch")
 	}
 
-	lib.File.Output("Checking Installation...")
+	lib.File.Output("Checking gomu installation...")
 	currentVersion, _ = lib.File.CmdOutput("gomu", "version")
 	originalBranch, _ = lib.File.CurrentBranch()
 	hasChanges = lib.File.HasChanges()
