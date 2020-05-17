@@ -164,10 +164,10 @@ func upgradeGomu(cmd *flag.Command) (err error) {
 
 	lib.File.Output("Installing " + version + "...")
 
-	if err = lib.File.RunCmd("./install.sh", version); err != nil {
+	if err = lib.File.RunCmd("./bin/install", version); err != nil {
 		// Try again with permissions
 		err = nil
-		if err = lib.File.RunCmd("sudo", "./install.sh", version); err != nil {
+		if err = lib.File.RunCmd("sudo", "./bin/install", version); err != nil {
 			lib.File.Output("Failed to install :(")
 
 			if len(originalBranch) > 0 {
