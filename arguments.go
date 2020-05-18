@@ -120,7 +120,7 @@ func gomuOptions() (options gomu.Options) {
 		showHelp(cmd)
 		os.Exit(0)
 	case "upgrade":
-		upgradeGomu(cmd)
+		upgrade(cmd)
 		os.Exit(0)
 	}
 

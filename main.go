@@ -3,9 +3,16 @@ package main
 import (
 	mod "github.com/hatchify/mod-utils"
 	com "github.com/hatchify/mod-utils/com"
+	"github.com/hatchify/scribe"
 )
 
+var out *scribe.Scribe
+
 func main() {
+	outW := scribe.NewStdout()
+	outW.SetTypePrefix(scribe.TypeNotification, ":: gomu :: ")
+	out = scribe.NewWithWriter(outW, "")
+
 	// Parse command line values, check supported functions, set defaults
 	gomu := fromArgs()
 

@@ -10,7 +10,6 @@ import (
 	flag "github.com/hatchify/parg"
 )
 
-var version = "undefined"
 var logLevel = "NORMAL"
 
 func readInput() {
