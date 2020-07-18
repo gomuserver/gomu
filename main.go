@@ -1,8 +1,8 @@
 package main
 
 import (
-	mod "github.com/hatchify/mod-utils"
-	com "github.com/hatchify/mod-utils/com"
+	mod "github.com/gomuserver/mod-utils"
+	"github.com/gomuserver/mod-utils/com"
 	"github.com/hatchify/scribe"
 )
 

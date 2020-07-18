@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	gomu "github.com/hatchify/mod-utils"
-	com "github.com/hatchify/mod-utils/com"
+	gomu "github.com/gomuserver/mod-utils"
+	"github.com/gomuserver/mod-utils/com"
 	flag "github.com/hatchify/parg"
 )
 

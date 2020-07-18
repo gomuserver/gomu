@@ -4,7 +4,7 @@ import (
 	"os/user"
 	"path"
 
-	gomu "github.com/hatchify/mod-utils"
+	gomu "github.com/gomuserver/mod-utils"
 	flag "github.com/hatchify/parg"
 )
 
@@ -34,7 +34,7 @@ func upgrade(cmd *flag.Command) (err error) {
 		return
 	}
 
-	lib := gomu.LibraryFromPath(path.Join(usr.HomeDir, "go", "src", "github.com", "hatchify", "gomu"))
+	lib := gomu.LibraryFromPath(path.Join(usr.HomeDir, "go", "src", "github.com", "gomuserver", "gomu"))
 	lib.File.Fetch()
 
 	if len(cmd.Arguments) > 0 {

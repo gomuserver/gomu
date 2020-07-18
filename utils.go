@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hatchify/mod-utils/com"
+	"github.com/gomuserver/mod-utils/com"
 	flag "github.com/hatchify/parg"
 )
 
