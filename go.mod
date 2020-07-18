@@ -1,10 +1,5 @@
-module github.com/hatchify/gomu
+module github.com/gomuserver/gomu
 
 go 1.14
 
-require (
-	github.com/hatchify/mod-utils v0.5.59
-	github.com/hatchify/parg v0.1.26
-	github.com/hatchify/scribe v0.4.79
-	github.com/hatchify/simply v0.0.17
-)
+require github.com/gomuserver/mod-utils v0.0.1 // indirect
