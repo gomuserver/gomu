@@ -1,7 +1,7 @@
 github.com/Hatch1fy/cron v0.4.78 h1:aNdJfiFYfEPWprxEBHM9taHV6jwWjMo17OvQYnD8528=
 github.com/Hatch1fy/cron v0.4.78/go.mod h1:srziZhU5rAzVXoUSkVkzq3iZOk+u+Y7pV3nL+dXN9L4=
-github.com/Hatch1fy/errors v0.4.78 h1:Xd64lclmP6Gg5i9WFm0wJWkcmf/1rd82DavHTpLVLZs=
-github.com/Hatch1fy/errors v0.4.78/go.mod h1:SJFCeScmERvwtYMG7EU24Fe0KfXmiIs7tNlcIl0STKk=
+github.com/Hatch1fy/errors v0.4.80 h1:LBr5Elytx6npBlF/36KTamC6I7h6VqkOVkRkbIdj3xY=
+github.com/Hatch1fy/errors v0.4.80/go.mod h1:SJFCeScmERvwtYMG7EU24Fe0KfXmiIs7tNlcIl0STKk=
 github.com/gomuserver/mod-utils v0.0.3 h1:gyNX8tkFr/yrpuaDjxwPhLFhEgh5+D0hlc/teIXKrgw=
 github.com/gomuserver/mod-utils v0.0.3/go.mod h1:F87O+eBDQALvugLWeC6ZdZEHjrDRWZ5ctbHQDpobyJ8=
 github.com/hatchify/atoms v0.4.78 h1:PabaS9MFpNaE5V7fVzjtRRxWiec61WwAwOjdAOZkKEE=
@@ -12,8 +12,8 @@ github.com/hatchify/colors v0.4.78 h1:T76bb++0Kc4VPpDR18p3KD81vSDFPWKd46EKgkxyX/
 github.com/hatchify/colors v0.4.78/go.mod h1:t0952Ef1zDFMVTCkOwhrdJS9ToVWTdcJ3PWCHZADLuU=
 github.com/hatchify/parg v0.1.27 h1:Qy1tYOKbu8DKymwqHNVIgiJwDAY9NpZDwCyym8p+hMY=
 github.com/hatchify/parg v0.1.27/go.mod h1:JxN7ZXcoW3SMv0WSw+5tlGDdZ2Txa7XCC+8jlSx+ImM=
-github.com/hatchify/scribe v0.4.80 h1:TzXO+Mv5j9CoUIdt9JLGl9fJ1lTBti5Se9IgHRzi6NM=
-github.com/hatchify/scribe v0.4.80/go.mod h1:kqwVjh0PGR6N7EMSrim6yGIUirdkYouXVl9Sw4rONAg=
+github.com/hatchify/scribe v0.4.81 h1:kagGTvTaPJ4F8vWRCvieWmVdpqGU7YoXOf2PpI4085E=
+github.com/hatchify/scribe v0.4.81/go.mod h1:dNVgLOuKsrq5CQnL8aopJSzWFyriRiw4PF6cinbc+dU=
 github.com/hatchify/simply v0.0.17 h1:JZBt1K5+Gc+ZiOl96AEK9rNBF42tMMwEajltIbdXnbU=
 github.com/hatchify/simply v0.0.17/go.mod h1:Zt75bbQLhETkkPSie6LEtRr13bt0cy4YzQrUoOH+xbI=
 github.com/remeh/sizedwaitgroup v1.0.0 h1:VNGGFwNo/R5+MJBf6yrsr110p0m4/OX4S3DCy7Kyl5E=
